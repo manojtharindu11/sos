@@ -7,10 +7,16 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+require('dotenv').config();
+
+// Corrected MongoDB URI connection string options
 mongoose
   .connect(
-    process.env.MONGODB_URI || "mongodb://localhost:27017/escapeRoomGame",
-    { userNewUrlParser: true, useUnifiedTopology: true }
+    process.env.MONGODB_URI,
+    {
+      useNewUrlParser: true, // Corrected option name
+      useUnifiedTopology: true,
+    }
   )
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log("Failed to connect to MongoDB", err));
