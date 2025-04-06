@@ -1,0 +1,20 @@
+{
+  "name": "escape-room-game",
+  "version": "1.0.0",
+  "description": "In an escape room game, players work together to solve puzzles and find clues within a set time limit to \"escape\" the room. You could create multiple rooms, each with its own unique puzzles.",
+  "homepage": "https://github.com/manojtharindu11/escape-room-game#readme",
+  "bugs": {
+    "url": "https://github.com/manojtharindu11/escape-room-game/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manojtharindu11/escape-room-game.git"
+  },
+  "license": "ISC",
+  "author": "Manoj Thilakarathna",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
