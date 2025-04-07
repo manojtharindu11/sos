@@ -1,38 +1,62 @@
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
-const mongoose = require("mongoose");
+const cors = require("cors");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
-
-require('dotenv').config();
-
-// Corrected MongoDB URI connection string options
-mongoose
-  .connect(
-    process.env.MONGODB_URI,
-    {
-      useNewUrlParser: true, // Corrected option name
-      useUnifiedTopology: true,
-    }
-  )
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.log("Failed to connect to MongoDB", err));
-
-app.get("/", (req, res) => {
-  res.send("Welcome to the Escape Room Game API!");
+const io = socketIo(server, {
+  cors: { origin: "*" },
 });
 
+let gameState = {
+  players: [],
+  board: Array(3).fill(null).map(() => Array(3).fill("")),
+  scores: {},
+  currentPlayer: 0,
+};
+
 io.on("connection", (socket) => {
-  console.log("a user connected");
+  console.log("New connection:", socket.id);
+
+  socket.on("joinGame", (playerName) => {
+    if (gameState.players.length >= 2) return;
+
+    gameState.players.push({ id: socket.id, name: playerName });
+    gameState.scores[playerName] = 0;
+
+    io.emit("gameUpdate", gameState);
+    console.log(`${playerName} joined the game`);
+
+    if (gameState.players.length === 2) {
+      io.emit("startGame", gameState);
+    }
+  });
+
+  socket.on("makeMove", ({ row, col, symbol }) => {
+    if (!gameState.board[row][col]) {
+      gameState.board[row][col] = symbol;
+      // Example logic: if move was valid, give point
+      const currentPlayerName = gameState.players[gameState.currentPlayer].name;
+      gameState.scores[currentPlayerName] += 1; // Add actual scoring logic here
+
+      gameState.currentPlayer = (gameState.currentPlayer + 1) % 2;
+      io.emit("gameUpdate", gameState);
+    }
+  });
 
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    console.log("Disconnected:", socket.id);
+    gameState = {
+      players: [],
+      board: Array(3).fill(null).map(() => Array(3).fill("")),
+      scores: {},
+      currentPlayer: 0,
+    };
+    io.emit("resetGame");
   });
 });
 
 server.listen(5000, () => {
-  console.log("Server is running on port 5000");
+  console.log("Server running on http://localhost:5000");
 });

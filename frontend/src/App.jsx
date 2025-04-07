@@ -1,11 +1,13 @@
-import "./App.css";
+// src/App.jsx
+import React from "react";
+import GameBoard from "./components/GameBoard";
 
 function App() {
-
   return (
-    <>
-      <p>Hellow</p>
-    </>
+    <div>
+      <h1 style={{ textAlign: "center" }}>🧠 SOS Game</h1>
+      <GameBoard />
+    </div>
   );
 }
 
