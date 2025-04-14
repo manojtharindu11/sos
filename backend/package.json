@@ -1,14 +1,14 @@
 {
-  "name": "escape-room-game",
+  "name": "sos",
   "version": "1.0.0",
-  "description": "In an escape room game, players work together to solve puzzles and find clues within a set time limit to \"escape\" the room. You could create multiple rooms, each with its own unique puzzles.",
-  "homepage": "https://github.com/manojtharindu11/escape-room-game#readme",
+  "description": "A simple SOS application",
+  "homepage": "https://github.com/manojtharindu11/sos#readme",
   "bugs": {
-    "url": "https://github.com/manojtharindu11/escape-room-game/issues"
+    "url": "https://github.com/manojtharindu11/sos/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/manojtharindu11/escape-room-game.git"
+    "url": "git+https://github.com/manojtharindu11/sos.git"
   },
   "license": "ISC",
   "author": "Manoj Thilakarathna",
