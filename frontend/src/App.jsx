@@ -1,13 +1,19 @@
-// src/App.jsx
 import React from "react";
-import GameBoard from "./components/GameBoard";
+import { ChakraProvider } from "@chakra-ui/react";
+import Game from "./pages/Game";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Home from "./pages/Home";
 
 function App() {
   return (
-    <div>
-      <h1 style={{ textAlign: "center" }}>🧠 SOS Game</h1>
-      <GameBoard />
-    </div>
+    <ChakraProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/game" element={<Game />} />
+        </Routes>
+      </Router>
+    </ChakraProvider>
   );
 }
 
