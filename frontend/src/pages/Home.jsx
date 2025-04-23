@@ -49,7 +49,7 @@ function Home() {
                 borderColor: "blue.500",
               }}
               transition="all 0.2s ease-in-out"
-              onClick={() => navigate("/register")}
+              onClick={() => navigate("/signup")}
             >
               Sign Up
             </Button>
