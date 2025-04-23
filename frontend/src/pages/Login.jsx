@@ -1,4 +1,4 @@
-import React, { use, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -11,10 +11,14 @@ import {
   Text,
   Container,
 } from "@chakra-ui/react";
+import { login_async } from "../api/auth";
+import { useToast } from "@chakra-ui/react";
 
 function Login() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
+  const toast = useToast();
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -22,7 +26,27 @@ function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Login form submitted:", form);
-    // You can send this to your backend
+    login_async(form)
+      .then((response) => {
+        console.log("Login successful:", response);
+        toast({
+          title: "Login successful",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: "top-right",
+        });
+      })
+      .catch((error) => {
+        console.error("Login failed:", error);
+        toast({
+          title: "Login failed",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "top-right",
+        });
+      });
   };
 
   return (

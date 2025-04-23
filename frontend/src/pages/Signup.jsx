@@ -11,10 +11,14 @@ import {
   Text,
   Container,
 } from "@chakra-ui/react";
+import { signup_async } from "../api/auth";
+import { useToast } from "@chakra-ui/react";
 
 function Signup() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ username: "", email: "", password: "" });
+  const tost = useToast();
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -22,7 +26,28 @@ function Signup() {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Signup form submitted:", form);
-    // You can send this to your backend
+    signup_async(form)
+      .then((response) => {
+        console.log("Signup successful:", response);
+        tost({
+          title: "Signup successful",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: "top-right",
+        });
+        navigate("/login");
+      })
+      .catch((error) => {
+        console.error("Signup failed:", error);
+        tost({
+          title: "Signup failed",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "top-right",
+        });
+      });
   };
 
   return (

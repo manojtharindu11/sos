@@ -1,62 +1,32 @@
+require("dotenv").config();
 const express = require("express");
-const http = require("http");
-const socketIo = require("socket.io");
+const mongoose = require("mongoose");
 const cors = require("cors");
+const http = require("http");
+const { Server } = require("socket.io");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: { origin: "*" },
+const routes = require("./routes/routes");
+
+// Socket.IO setup
+const io = new Server(server, {
+  cors: { origin: "http://localhost:5173", methods: ["GET", "POST"] },
 });
 
-let gameState = {
-  players: [],
-  board: Array(3).fill(null).map(() => Array(3).fill("")),
-  scores: {},
-  currentPlayer: 0,
-};
+// MongoDB Connection
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("DB Error:", err));
 
-io.on("connection", (socket) => {
-  console.log("New connection:", socket.id);
+app.use(cors());
+app.use(express.json());
+app.use('/api/v1', routes); // API routes
 
-  socket.on("joinGame", (playerName) => {
-    if (gameState.players.length >= 2) return;
+// Socket logic
+require("./socket/socket")(io);
 
-    gameState.players.push({ id: socket.id, name: playerName });
-    gameState.scores[playerName] = 0;
-
-    io.emit("gameUpdate", gameState);
-    console.log(`${playerName} joined the game`);
-
-    if (gameState.players.length === 2) {
-      io.emit("startGame", gameState);
-    }
-  });
-
-  socket.on("makeMove", ({ row, col, symbol }) => {
-    if (!gameState.board[row][col]) {
-      gameState.board[row][col] = symbol;
-      // Example logic: if move was valid, give point
-      const currentPlayerName = gameState.players[gameState.currentPlayer].name;
-      gameState.scores[currentPlayerName] += 1; // Add actual scoring logic here
-
-      gameState.currentPlayer = (gameState.currentPlayer + 1) % 2;
-      io.emit("gameUpdate", gameState);
-    }
-  });
-
-  socket.on("disconnect", () => {
-    console.log("Disconnected:", socket.id);
-    gameState = {
-      players: [],
-      board: Array(3).fill(null).map(() => Array(3).fill("")),
-      scores: {},
-      currentPlayer: 0,
-    };
-    io.emit("resetGame");
-  });
-});
-
-server.listen(5000, () => {
-  console.log("Server running on http://localhost:5000");
-});
+// Start server
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
