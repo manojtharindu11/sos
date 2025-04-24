@@ -23,7 +23,7 @@ exports.handleSignup = async (username, email, password) => {
 
     await newUser.save();
 
-    return newUser.id;
+    return newUser.id
   } catch (error) {
     throw error;
   }
