@@ -1,5 +1,10 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const {
+  generateAccessToken,
+  generateRefreshToken,
+} = require("../utils/jwtUtils");
+const { json } = require("express");
 
 exports.handleLogin = async (username, password) => {
   try {
@@ -14,6 +19,17 @@ exports.handleLogin = async (username, password) => {
     if (!isMatch) {
       throw new Error("Invalid password");
     }
+
+    const payload = { id: user.id, username: user.username, email: user.email };
+    const accessToken = generateAccessToken(payload);
+    const refreshToken = generateRefreshToken(payload);
+
+    user.refreshToken = refreshToken;
+    user.accessToken = accessToken;
+
+    await user.save();
+
+    return { accessToken, refreshToken };
   } catch (error) {
     throw error;
   }

@@ -10,14 +10,18 @@ exports.login = async (req, res) => {
     }
 
     const { username, password } = req.body;
-    const response = await authService.handleLogin(username, password);
-    res.status(200).json({ message: "Login successful", response });
+    const { accessToken, refreshToken } = await authService.handleLogin(
+      username,
+      password
+    );
+    res.status(200).json({
+      message: "Login successful",
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
   } catch (error) {
     res.status(500).json({ message: "Login failed", error: error.message });
   }
-  res.status(200).json({
-    message: "Login successful",
-  });
 };
 
 exports.signup = async (req, res) => {

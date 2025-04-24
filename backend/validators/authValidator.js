@@ -13,11 +13,10 @@ exports.validateSignup = [
 
 exports.validateLogin = [
   body("username")
-    .notEmpty()
-    .withMessage("Username is required")
-    .isLength({ min: 3 }),
+  .notEmpty()
+  .withMessage("Username is required")
+  .isLength({ min: 3 }),
   body("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters"),
 ];
-
