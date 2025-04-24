@@ -17,7 +17,7 @@ import { login_async } from "../api/auth";
 
 function Login() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [form, setForm] = useState({ username: "", password: "" });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const toast = useToast();
@@ -25,10 +25,8 @@ function Login() {
   const validateLoginData = (formData) => {
     const newErrors = {};
 
-    if (!formData.email || formData.email.trim() === "") {
-      newErrors.email = "Email is required";
-    } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
-      newErrors.email = "Email is not valid";
+    if (!formData.username || formData.username.trim().length < 3) {
+      newErrors.username = "Username must be at least 3 characters";
     }
 
     if (!formData.password || formData.password.trim() === "") {
@@ -40,9 +38,10 @@ function Login() {
 
   const validateSingleField = (name, value) => {
     switch (name) {
-      case "email":
-        if (!value.trim()) return "Email is required";
-        if (!/^\S+@\S+\.\S+$/.test(value)) return "Email is not valid";
+      case "username":
+        if (!value.trim()) return "Username is required";
+        if (value.trim().length < 3)
+          return "Username must be at least 3 characters";
         break;
       case "password":
         if (!value.trim()) return "Password is required";
@@ -77,6 +76,7 @@ function Login() {
     try {
       setLoading(true);
       const response = await login_async(form);
+      console.log("Login successful", response);
       toast({
         title: "Login successful",
         status: "success",
@@ -88,7 +88,7 @@ function Login() {
     } catch (error) {
       console.error("Login failed:", error);
       toast({
-        title: error?.response?.data?.message || "Invalid email or password",
+        title: error?.response?.data?.message || "Invalid username or password",
         status: "error",
         duration: 5000,
         isClosable: true,
@@ -109,16 +109,16 @@ function Login() {
 
           <form onSubmit={handleSubmit}>
             <VStack spacing={4}>
-              <FormControl isInvalid={!!errors.email} isRequired>
-                <FormLabel>Email</FormLabel>
+              <FormControl isInvalid={!!errors.username} isRequired>
+                <FormLabel>Username</FormLabel>
                 <Input
-                  type="email"
-                  name="email"
-                  placeholder="Enter email"
-                  value={form.email}
+                  type="text"
+                  name="username"
+                  placeholder="Enter username"
+                  value={form.username}
                   onChange={handleChange}
                 />
-                <FormErrorMessage>{errors.email}</FormErrorMessage>
+                <FormErrorMessage>{errors.username}</FormErrorMessage>
               </FormControl>
 
               <FormControl isInvalid={!!errors.password} isRequired>
