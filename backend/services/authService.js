@@ -3,8 +3,8 @@ const bcrypt = require("bcryptjs");
 const {
   generateAccessToken,
   generateRefreshToken,
+  verifyRefreshToken,
 } = require("../utils/jwtUtils");
-const { json } = require("express");
 
 exports.handleLogin = async (username, password) => {
   try {
@@ -54,6 +54,30 @@ exports.handleSignup = async (username, email, password) => {
     await newUser.save();
 
     return newUser.id;
+  } catch (error) {
+    throw error;
+  }
+};
+
+exports.handleRefreshToken = async (token) => {
+  try {
+    const userData = verifyRefreshToken(token);
+    if (!userData) {
+      throw new Error("Token is not valid");
+    }
+    const payload = {
+      id: userData.id,
+      username: userData.username,
+      email: userData.email,
+    };
+
+    const newAccessToken = generateAccessToken(payload);
+
+    const user = await User.findById(userData.id);
+    user.accessToken = newAccessToken;
+
+    await user.save();
+    return newAccessToken;
   } catch (error) {
     throw error;
   }

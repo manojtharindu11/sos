@@ -39,3 +39,21 @@ exports.signup = async (req, res) => {
     res.status(500).json({ message: "Signup failed", error: error.message });
   }
 };
+
+exports.refreshToken = async (req, res) => {
+  const { token } = req.body;
+  if (!token) {
+    return res.status(403).json({ message: "Refresh token invalid" });
+  }
+
+  try {
+    const accessToken = await authService.handleRefreshToken(token);
+    res.status(200).json({ newAccessToken: accessToken });
+  } catch (error) {
+    res.status(403).json({ message: "Token verification failed" });
+  }
+};
+
+exports.protected = async (req, res) => {
+  res.json({ message: `Hello ${req.user.username}, you are authenticated!` });
+};
