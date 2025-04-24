@@ -5,48 +5,98 @@ import {
   Button,
   FormControl,
   FormLabel,
+  FormErrorMessage,
   Input,
   Heading,
   VStack,
   Text,
   Container,
+  useToast,
 } from "@chakra-ui/react";
 import { login_async } from "../api/auth";
-import { useToast } from "@chakra-ui/react";
 
 function Login() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
-  const toast = useToast();
+  const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const validateLoginData = (formData) => {
+    const newErrors = {};
 
-  const handleSubmit = (e) => {
+    if (!formData.email || formData.email.trim() === "") {
+      newErrors.email = "Email is required";
+    } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+      newErrors.email = "Email is not valid";
+    }
+
+    if (!formData.password || formData.password.trim() === "") {
+      newErrors.password = "Password is required";
+    }
+
+    return newErrors;
+  };
+
+  const validateSingleField = (name, value) => {
+    switch (name) {
+      case "email":
+        if (!value.trim()) return "Email is required";
+        if (!/^\S+@\S+\.\S+$/.test(value)) return "Email is not valid";
+        break;
+      case "password":
+        if (!value.trim()) return "Password is required";
+        break;
+      default:
+        break;
+    }
+    return null;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    const updatedForm = { ...form, [name]: value };
+    setForm(updatedForm);
+
+    const fieldError = validateSingleField(name, value);
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: fieldError || undefined,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login form submitted:", form);
-    login_async(form)
-      .then((response) => {
-        console.log("Login successful:", response);
-        toast({
-          title: "Login successful",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-          position: "top-right",
-        });
-      })
-      .catch((error) => {
-        console.error("Login failed:", error);
-        toast({
-          title: "Login failed",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-          position: "top-right",
-        });
+
+    const validationErrors = validateLoginData(form);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await login_async(form);
+      toast({
+        title: "Login successful",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
       });
+      // Redirect or store token if needed
+    } catch (error) {
+      console.error("Login failed:", error);
+      toast({
+        title: error?.response?.data?.message || "Invalid email or password",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top-right",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,7 +109,7 @@ function Login() {
 
           <form onSubmit={handleSubmit}>
             <VStack spacing={4}>
-              <FormControl isRequired>
+              <FormControl isInvalid={!!errors.email} isRequired>
                 <FormLabel>Email</FormLabel>
                 <Input
                   type="email"
@@ -68,9 +118,10 @@ function Login() {
                   value={form.email}
                   onChange={handleChange}
                 />
+                <FormErrorMessage>{errors.email}</FormErrorMessage>
               </FormControl>
 
-              <FormControl isRequired>
+              <FormControl isInvalid={!!errors.password} isRequired>
                 <FormLabel>Password</FormLabel>
                 <Input
                   type="password"
@@ -79,9 +130,15 @@ function Login() {
                   value={form.password}
                   onChange={handleChange}
                 />
+                <FormErrorMessage>{errors.password}</FormErrorMessage>
               </FormControl>
 
-              <Button colorScheme="blue" type="submit" width="full">
+              <Button
+                colorScheme="blue"
+                type="submit"
+                width="full"
+                isLoading={loading}
+              >
                 Log In
               </Button>
             </VStack>
