@@ -25,6 +25,11 @@ axiosInstance.interceptors.response.use(
       } else if (status >= 500) {
         // Handle server errors
         alert("Server error. Please try again later.");
+      } else if (status === 422) {
+        const errors = error.response.data.errors;
+        for (const error of errors) {
+          console.log(error.msg);
+        }
       }
 
       return Promise.reject({ status, message, originalError: error });
