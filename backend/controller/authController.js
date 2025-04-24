@@ -1,8 +1,20 @@
 const authService = require("../services/authService");
 const { validationResult } = require("express-validator");
 
-exports.login = (req, res) => {
-  authService.handleLogin(req);
+exports.login = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() });
+    }
+
+    const { username, password } = req.body;
+    const response = await authService.handleLogin(username, password);
+    res.status(200).json({ message: "Login successful", response });
+  } catch (error) {
+    res.status(500).json({ message: "Login failed", error: error.message });
+  }
   res.status(200).json({
     message: "Login successful",
   });

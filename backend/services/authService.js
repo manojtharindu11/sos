@@ -1,8 +1,22 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 
-exports.handleLogin = (data) => {
-  console.log(data);
+exports.handleLogin = async (username, password) => {
+  try {
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      throw new Error("Invalid password");
+    }
+  } catch (error) {
+    throw error;
+  }
 };
 
 exports.handleSignup = async (username, email, password) => {
@@ -23,7 +37,7 @@ exports.handleSignup = async (username, email, password) => {
 
     await newUser.save();
 
-    return newUser.id
+    return newUser.id;
   } catch (error) {
     throw error;
   }
