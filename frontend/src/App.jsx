@@ -6,33 +6,36 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import AuthProtectedRoute from "./guards/authGuard";
 import Game from "./pages/Game";
+import { UserProvider } from "./context/userContext";
 
 function App() {
   return (
     <ChakraProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route
-            path="/signup"
-            element={
-              <AuthProtectedRoute onlyPublic={true}>
-                <Signup />
-              </AuthProtectedRoute>
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <AuthProtectedRoute onlyPublic={true}>
-                <Login />
-              </AuthProtectedRoute>
-            }
-          />
-          <Route path="*" element={<Home />} />
-          <Route path="/game" element={<Game/>}/>
-        </Routes>
-      </Router>
+      <UserProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route
+              path="/signup"
+              element={
+                <AuthProtectedRoute onlyPublic={true}>
+                  <Signup />
+                </AuthProtectedRoute>
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <AuthProtectedRoute onlyPublic={true}>
+                  <Login />
+                </AuthProtectedRoute>
+              }
+            />
+            <Route path="*" element={<Home />} />
+            <Route path="/game" element={<Game />} />
+          </Routes>
+        </Router>
+      </UserProvider>
     </ChakraProvider>
   );
 }
