@@ -10,9 +10,9 @@ const server = http.createServer(app);
 const routes = require("./routes/routes");
 
 // Socket.IO setup
-// const io = new Server(server, {
-//   cors: { origin: process.env("FRONTEND_URL"), methods: ["GET", "POST"] },
-// });
+const io = new Server(server, {
+  cors: { origin: process.env.FRONTEND_URL, methods: ["GET", "POST"] },
+});
 
 // MongoDB Connection
 mongoose
@@ -25,7 +25,7 @@ app.use(express.json());
 app.use("/api/v1", routes); // API routes
 
 // Socket logic
-// require("./socket/socket")(io);
+require("./socket/socket")(io);
 
 // Start server
 const PORT = process.env.PORT || 5000;

@@ -84,7 +84,7 @@ function Login() {
         isClosable: true,
         position: "top-right",
       });
-      // Redirect or store token if needed
+      navigate("/home");
     } catch (error) {
       console.error("Login failed:", error);
       toast({
