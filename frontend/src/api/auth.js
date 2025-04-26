@@ -6,7 +6,8 @@ export const login_async = async (credentials) => {
     if (response) {
       const accessToken = response.data.accessToken;
       const refreshToken = response.data.refreshToken;
-      console.log(accessToken,refreshToken)
+      setAccessToken(accessToken);
+      setRefreshToken(refreshToken);
     }
     return response.data;
   } catch (error) {
@@ -21,4 +22,21 @@ export const signup_async = async (userData) => {
   } catch (error) {
     throw error;
   }
+};
+
+export const logout = () => {
+  sessionStorage.removeItem("accessToken");
+  sessionStorage.removeItem("refreshToken");
+};
+
+export const isAuthenticated = () => {
+  return !!sessionStorage.getItem("accessToken");
+};
+
+const setAccessToken = (token) => {
+  sessionStorage.setItem("accessToken", token);
+};
+
+const setRefreshToken = (token) => {
+  sessionStorage.setItem("refreshToken", token);
 };
