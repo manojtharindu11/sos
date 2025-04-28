@@ -1,43 +1,54 @@
 const Game = require("../models/Game");
+const User = require("../models/User");
 
 module.exports = function (io) {
-  io.on("connection", (socket) => {
-    console.log("User connected:", socket.id);
+  const userSocketMap = [];
 
-    socket.on("join_game", async ({ gameId, player }) => {
-      socket.join(gameId);
-      console.log(`${player} joined game ${gameId}`);
+  io.on("connection", async (socket) => {
+    const userId = socket.handshake.query.userId;
 
-      // // Update the game in the database
-      // try {
-      //   await Game.findByIdAndUpdate(
-      //     gameId,
-      //     { $push: { players: player } },
-      //     { new: true }
-      //   );
-      // } catch (err) {
-      //   console.error("Error updating game:", err);
-      // }
+    if (userId) {
+      try {
+        const user = await User.findById(userId);
+        if (user) {
+          userSocketMap.push({
+            userId: userId,
+            socketId: socket.id,
+            username: user.username,
+          });
+          console.log(
+            `✅ User connected: ${userId}, Username: ${user.username}, Socket ID: ${socket.id}`
+          );
 
-      io.to(gameId).emit("player_joined", { player });
-    });
+          // 🔥 Send active users immediately after new user added
+          io.emit("active_users", userSocketMap);
 
-    socket.on("make_move", async ({ gameId, row, col, letter, player }) => {
-      io.to(gameId).emit("move_made", { row, col, letter, player });
-      console.log(row, col, letter, player);
-      // try {
-      //   await Game.findByIdAndUpdate(
-      //     gameId,
-      //     { $push: { moves: { row, col, letter, player } } },
-      //     { new: true }
-      //   );
-      // } catch (err) {
-      //   console.error("Error saving move:", err);
-      // }
-    });
+        } else {
+          console.log(`❌ User not found with ID: ${userId}`);
+        }
+      } catch (error) {
+        console.error(`Error fetching user with ID ${userId}:`, error);
+      }
 
-    socket.on("disconnect", () => {
-      console.log("User disconnected:", socket.id);
-    });
+      socket.on("get_active_users", () => {
+        socket.emit("active_users", userSocketMap);
+      });
+
+      socket.on("disconnect", () => {
+        console.log("User disconnected:", socket.id);
+        const index = userSocketMap.findIndex(
+          (user) => user.socketId === socket.id
+        );
+        if (index !== -1) {
+          console.log(
+            `User ${userSocketMap[index].username} removed from active users.`
+          );
+          userSocketMap.splice(index, 1);
+
+          // 🔥 After removing user, send updated list
+          io.emit("active_users", userSocketMap);
+        }
+      });
+    }
   });
 };

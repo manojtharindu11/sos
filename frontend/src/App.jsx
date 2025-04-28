@@ -31,8 +31,15 @@ function App() {
                 </AuthProtectedRoute>
               }
             />
+            <Route
+              path="/game"
+              element={
+                <AuthProtectedRoute onlyPublic={false}>
+                  <Game />
+                </AuthProtectedRoute>
+              }
+            />
             <Route path="*" element={<Home />} />
-            <Route path="/game" element={<Game />} />
           </Routes>
         </Router>
       </UserProvider>

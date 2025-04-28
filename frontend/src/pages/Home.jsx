@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -11,9 +11,28 @@ import {
   Container,
   Flex,
 } from "@chakra-ui/react";
+import { isAuthenticated, logout } from "../api/auth";
 
 function Home() {
   const navigate = useNavigate();
+
+  // State for managing hover effect
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Handle log out
+  const handleLogOut = () => {
+    logout();
+    navigate("/login");
+  };
+
+  // Inline style for the button
+  const logoutButtonStyle = {
+    backgroundColor: isHovered ? "white" : "#f56565", // Change on hover
+    color: isHovered ? "#f56565" : "white", // Change on hover
+    border: "1px solid",
+    borderColor: isHovered ? "#f56565" : "transparent", // Change on hover
+    transition: "all 0.2s ease-in-out", // Smooth transition
+  };
 
   return (
     <Box minH="100vh" bg="gray.50" py={12}>
@@ -25,34 +44,48 @@ function Home() {
           </Heading>
           <Spacer />
           <HStack spacing={4}>
-            <Button
-              colorScheme="blue"
-              variant="outline"
-              _hover={{
-                bg: "blue.500",
-                color: "white",
-                borderColor: "blue.500",
-              }}
-              transition="all 0.2s ease-in-out"
-              onClick={() => navigate("/login")}
-            >
-              Log In
-            </Button>
-            <Button
-              colorScheme="blue"
-              bg="blue.500"
-              color="white"
-              _hover={{
-                bg: "white",
-                color: "white.500",
-                border: "1px solid",
-                borderColor: "blue.500",
-              }}
-              transition="all 0.2s ease-in-out"
-              onClick={() => navigate("/signup")}
-            >
-              Sign Up
-            </Button>
+            {!isAuthenticated() && (
+              <HStack spacing={4}>
+                <Button
+                  colorScheme="blue"
+                  variant="outline"
+                  _hover={{
+                    bg: "blue.500",
+                    color: "white",
+                    borderColor: "blue.500",
+                  }}
+                  transition="all 0.2s ease-in-out"
+                  onClick={() => navigate("/login")}
+                >
+                  Log In
+                </Button>
+                <Button
+                  colorScheme="blue"
+                  bg="blue.500"
+                  color="white"
+                  _hover={{
+                    bg: "white",
+                    color: "blue.500", // <-- Fixed here
+                    border: "1px solid",
+                    borderColor: "blue.500",
+                  }}
+                  transition="all 0.2s ease-in-out"
+                  onClick={() => navigate("/signup")}
+                >
+                  Sign Up
+                </Button>
+              </HStack>
+            )}
+            {isAuthenticated() && (
+              <Button
+                style={logoutButtonStyle} // Apply inline styles
+                onMouseEnter={() => setIsHovered(true)} // Hover in
+                onMouseLeave={() => setIsHovered(false)} // Hover out
+                onClick={handleLogOut}
+              >
+                Log out
+              </Button>
+            )}
           </HStack>
         </Flex>
 
@@ -82,6 +115,7 @@ function Home() {
               transform: "scale(1.03)",
             }}
             transition="all 0.2s ease-in-out"
+            onClick={() => navigate("/game")}
           >
             Get Started
           </Button>
