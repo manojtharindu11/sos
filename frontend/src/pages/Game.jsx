@@ -25,10 +25,17 @@ function Game() {
     setPlayer(user?.id);
   }, [user]);
 
-  const { startGame, board, makeMove, score, activeUsers, opponentUser } =
-    useGameSocket({
-      player,
-    });
+  const {
+    startGame,
+    board,
+    makeMove,
+    score,
+    activeUsers,
+    opponentUser,
+    currentTurn,
+  } = useGameSocket({
+    player,
+  });
 
   const handleStartGame = () => {
     startGame();
@@ -80,7 +87,13 @@ function Game() {
               <LetterSelector letter={letter} setLetter={setLetter} />
               <GameBoard
                 board={board}
-                onCellClick={(row, col) => makeMove(row, col, letter)}
+                currentTurn={currentTurn}
+                onCellClick={(row, col) => {
+                  if (!currentTurn) {
+                    return;
+                  }
+                  makeMove(row, col, letter);
+                }}
               />
               <Flex justifyContent="space-around" width="100%" mt={4}>
                 <Text fontWeight="bold">My Score: {score.Player1}</Text>
