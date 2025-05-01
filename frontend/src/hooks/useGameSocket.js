@@ -12,6 +12,7 @@ const useGameSocket = ({ player }) => {
   const [score, setScore] = useState({ Player1: 0, Player2: 0 });
   const [activeUsers, setActiveUsers] = useState([]);
   const [opponentUser, setOpponentUser] = useState();
+  const [currentTurn, setCurrentTurn] = useState(true);
 
   useEffect(() => {
     if (player !== undefined && !socket) {
@@ -40,6 +41,12 @@ const useGameSocket = ({ player }) => {
         setOpponentUser(opponentUser);
         console.log(opponentUser);
       });
+
+      socket.on("update_board", ({ board, currentTurn, scores }) => {
+        setBoard(board);
+        setCurrentTurn(currentTurn == player ? true : false);
+        setScore({ Player1: scores[player], player2: scores[opponentUser] });
+      });
     }
 
     return () => {
@@ -48,6 +55,7 @@ const useGameSocket = ({ player }) => {
         socket.off("active_users");
         socket.off("room_assigned");
         socket.off("game_ready");
+        socket.off("update_board");
         socket.disconnect();
         socket = null; // 🔥 Important: Set it to null after disconnect
         console.log("❌ Socket disconnected.");
@@ -72,7 +80,15 @@ const useGameSocket = ({ player }) => {
     socket.emit("game_started", { player });
   };
 
-  return { startGame, board, makeMove, score, activeUsers, opponentUser };
+  return {
+    startGame,
+    board,
+    makeMove,
+    score,
+    activeUsers,
+    opponentUser,
+    currentTurn,
+  };
 };
 
 export default useGameSocket;
