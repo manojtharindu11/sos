@@ -1,11 +1,10 @@
 const Game = require("../models/Game");
 const User = require("../models/User");
+const { v4: uuidv4 } = require("uuid");
 
 module.exports = function (io) {
   const userSocketMap = [];
   const gameRooms = {}; // { roomId: [socketId1, socketId2] }
-
-  let roomCounter = 1;
 
   io.on("connection", async (socket) => {
     const userId = socket.handshake.query.userId;
@@ -36,7 +35,7 @@ module.exports = function (io) {
       });
 
       // 🕹 Handle game start
-      socket.on("game_started", () => {
+      socket.on("game_started", async () => {
         console.log("🎮 Game started for:", socket.id);
 
         // 1. Try to find a room with only one player
@@ -51,7 +50,7 @@ module.exports = function (io) {
 
         // 2. If no available room, create a new one
         if (!joinedRoomId) {
-          const newRoomId = `room-sos-counter-${roomCounter++}`;
+          const newRoomId = `room-sos-${uuidv4()}`;
           gameRooms[newRoomId] = [socket.id];
           joinedRoomId = newRoomId;
         }
@@ -72,8 +71,75 @@ module.exports = function (io) {
           const player2Username = userSocketMap.find(
             (user) => user.socketId === player2
           ).username;
+
+          const player1UserId = userSocketMap.find(
+            (user) => user.socketId === player1
+          ).userId;
+          const player2UserId = userSocketMap.find(
+            (user) => user.socketId === player2
+          ).userId;
+
+          try {
+            const newGame = new Game({
+              _id: joinedRoomId,
+              players: [player1UserId, player2UserId],
+              currentTurn: player1UserId,
+              scores: {
+                [player1UserId]: 0,
+                [player2UserId]: 0,
+              },
+              board: Array(3).fill(null).map(() => Array(3).fill(null)), // <-- Add this!
+            });
+
+            await newGame.save(); // Don't forget to save the game to MongoDB
+            console.log("Game successfully stored:", newGame._id);
+          } catch (error) {
+            console.log("Error storing game", error);
+          }
           io.to(player1).emit("game_ready", player2Username);
           io.to(player2).emit("game_ready", player1Username);
+        }
+      });
+
+      socket.on("make_move", async ({ gameId, row, col, letter, player }) => {
+        try {
+          const game = await Game.findById(gameId);
+          if (!game) {
+            console.error(`❌ Game not found: ${gameId}`);
+            return;
+          }
+
+          // Ensure it's the player's turn
+          if (game.currentTurn !== player) {
+            console.warn(`⛔ Not ${player}'s turn`);
+            return;
+          }
+
+          const board = game.board;
+          if (!board[row][col]) {
+            board[row][col] = letter;
+            // Optional: score logic can go here
+            // if (letter forms SOS) { game.scores.set(player, (game.scores.get(player) || 0) + 1); }
+
+            // Change turn to other player
+            const otherPlayer = game.players.find((p) => p !== player);
+            game.currentTurn = otherPlayer;
+
+            // Save updated game
+            await game.save();
+
+            io.to(game._id).emit("update_board", {
+              board: game.board,
+              currentTurn: game.currentTurn,
+              scores: Object.fromEntries(game.scores),
+            });
+
+            console.log(`✅ Move updated: ${player} at (${row}, ${col})`);
+          } else {
+            console.warn(`⚠️ Cell already occupied: (${row}, ${col})`);
+          }
+        } catch (err) {
+          console.error("💥 Error handling make_move:", err);
         }
       });
 
