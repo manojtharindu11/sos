@@ -42,19 +42,16 @@ const useGameSocket = ({ player }) => {
 
       socket.on("room_assigned", (roomId) => {
         setGameId(roomId);
-        console.log(roomId);
       });
 
       socket.on("game_ready", (opponentUser, currentTurn) => {
         setOpponentUser(opponentUser);
         setCurrentTurn(currentTurn == player ? true : false);
-        console.log(opponentUser);
       });
 
       socket.on(
         "update_board",
         ({ board, currentTurn, scores, timeLeft, winningCells }) => {
-          console.log(board);
           setBoard(board);
           setCurrentTurn(currentTurn == player ? true : false);
           setScore({
@@ -93,8 +90,6 @@ const useGameSocket = ({ player }) => {
 
   const makeMove = (row, col, letter) => {
     const makeMove = (row, col, letter, player) => {
-      const timestamp = new Date().toISOString();
-
       setBoard((prevBoard) => {
         const newBoard = prevBoard.map((r) => r.map((cell) => ({ ...cell }))); // deep copy
         if (!newBoard[row][col].letter) {
@@ -113,7 +108,6 @@ const useGameSocket = ({ player }) => {
   };
 
   const startGame = () => {
-    console.log("Game started");
     socket.emit("game_started", { player });
   };
 

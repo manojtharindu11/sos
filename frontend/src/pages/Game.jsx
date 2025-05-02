@@ -86,8 +86,8 @@ function Game() {
             </>
           ) : opponentUser.username !== "" ? (
             <VStack spacing={6}>
-              <Timer currentTurn={currentTurn} timeLeft={timeLeft} />
               <Heading size="lg">SOS Game</Heading>
+              <Timer currentTurn={currentTurn} timeLeft={timeLeft} />
               <LetterSelector letter={letter} setLetter={setLetter} />
               <GameBoard
                 board={board}

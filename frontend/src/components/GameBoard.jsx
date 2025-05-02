@@ -1,7 +1,13 @@
 import React from "react";
 import { Grid, Button } from "@chakra-ui/react";
 
-const GameBoard = ({ board, onCellClick, currentTurn }) => (
+const GameBoard = ({
+  board,
+  userId,
+  onCellClick,
+  currentTurn,
+  totalWinningCells,
+}) => (
   <Grid templateColumns="repeat(3, 50px)" gap={2}>
     {board.map((row, i) =>
       row.map((cell, j) => {
