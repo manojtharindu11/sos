@@ -50,22 +50,18 @@ const useGameSocket = ({ player }) => {
         console.log(opponentUser);
       });
 
-      socket.on(
-        "update_board",
-        ({ board, currentTurn, scores, timeLeft, sosSequences }) => {
-          console.log(board);
-          setBoard(board);
-          setCurrentTurn(currentTurn == player ? true : false);
-          setScore({
-            Player1: scores[player],
-            Player2: Object.keys(scores).find((key) => key !== player)
-              ? scores[Object.keys(scores).find((key) => key !== player)]
-              : 0,
-          });
-          setTimeLeft(timeLeft);
-          console.log(sosSequences)
-        }
-      );
+      socket.on("update_board", ({ board, currentTurn, scores, timeLeft }) => {
+        console.log(board)
+        setBoard(board);
+        setCurrentTurn(currentTurn == player ? true : false);
+        setScore({
+          Player1: scores[player],
+          Player2: Object.keys(scores).find((key) => key !== player)
+            ? scores[Object.keys(scores).find((key) => key !== player)]
+            : 0,
+        });
+        setTimeLeft(timeLeft);
+      });
 
       socket.on("timer_tick", (timeLeft) => {
         setTimeLeft(timeLeft);
