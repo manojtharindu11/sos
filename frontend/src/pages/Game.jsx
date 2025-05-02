@@ -14,6 +14,7 @@ import LetterSelector from "../components/LetterSelector";
 import { UserContext } from "../context/userContext";
 import AllPlayers from "../components/AllPlayers";
 import ProfileCard from "../components/ProfileCard";
+import Timer from "../components/Timer";
 
 function Game() {
   const { user } = useContext(UserContext);
@@ -33,6 +34,7 @@ function Game() {
     activeUsers,
     opponentUser,
     currentTurn,
+    timeLeft,
   } = useGameSocket({
     player,
   });
@@ -81,13 +83,15 @@ function Game() {
                 Start Playing
               </Button>
             </>
-          ) : opponentUser !== undefined ? (
+          ) : opponentUser.username !== "" ? (
             <VStack spacing={6}>
+              <Timer currentTurn={currentTurn} timeLeft={timeLeft} />
               <Heading size="lg">SOS Game</Heading>
               <LetterSelector letter={letter} setLetter={setLetter} />
               <GameBoard
                 board={board}
                 currentTurn={currentTurn}
+                player1={player}
                 onCellClick={(row, col) => {
                   if (!currentTurn) {
                     return;
@@ -98,7 +102,7 @@ function Game() {
               <Flex justifyContent="space-around" width="100%" mt={4}>
                 <Text fontWeight="bold">My Score: {score.Player1}</Text>
                 <Text fontWeight="bold">
-                  {opponentUser} Score: {score.Player2}
+                  {opponentUser.username} Score: {score.Player2}
                 </Text>
               </Flex>
             </VStack>
