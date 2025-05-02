@@ -7,12 +7,19 @@ const useGameSocket = ({ player }) => {
   const [gameId, setGameId] = useState();
   const boardSize = 3;
   const [board, setBoard] = useState(() =>
-    Array.from({ length: boardSize }, () => Array(boardSize).fill(""))
+    Array.from({ length: boardSize }, () =>
+      Array.from({ length: boardSize }, () => ({ letter: "", player: null }))
+    )
   );
+
   const [score, setScore] = useState({ Player1: 0, Player2: 0 });
   const [activeUsers, setActiveUsers] = useState([]);
-  const [opponentUser, setOpponentUser] = useState();
-  const [currentTurn, setCurrentTurn] = useState(true);
+  const [opponentUser, setOpponentUser] = useState({
+    username: "",
+    userId: "",
+  });
+  const [currentTurn, setCurrentTurn] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(15);
 
   useEffect(() => {
     if (player !== undefined && !socket) {
@@ -37,15 +44,31 @@ const useGameSocket = ({ player }) => {
         console.log(roomId);
       });
 
-      socket.on("game_ready", (opponentUser) => {
+      socket.on("game_ready", (opponentUser, currentTurn) => {
         setOpponentUser(opponentUser);
+        setCurrentTurn(currentTurn == player ? true : false);
         console.log(opponentUser);
       });
 
-      socket.on("update_board", ({ board, currentTurn, scores }) => {
-        setBoard(board);
-        setCurrentTurn(currentTurn == player ? true : false);
-        setScore({ Player1: scores[player], player2: scores[opponentUser] });
+      socket.on(
+        "update_board",
+        ({ board, currentTurn, scores, timeLeft, sosSequences }) => {
+          console.log(board);
+          setBoard(board);
+          setCurrentTurn(currentTurn == player ? true : false);
+          setScore({
+            Player1: scores[player],
+            Player2: Object.keys(scores).find((key) => key !== player)
+              ? scores[Object.keys(scores).find((key) => key !== player)]
+              : 0,
+          });
+          setTimeLeft(timeLeft);
+          console.log(sosSequences)
+        }
+      );
+
+      socket.on("timer_tick", (timeLeft) => {
+        setTimeLeft(timeLeft);
       });
     }
 
@@ -56,6 +79,7 @@ const useGameSocket = ({ player }) => {
         socket.off("room_assigned");
         socket.off("game_ready");
         socket.off("update_board");
+        socket.off("timer_tick");
         socket.disconnect();
         socket = null; // 🔥 Important: Set it to null after disconnect
         console.log("❌ Socket disconnected.");
@@ -64,14 +88,23 @@ const useGameSocket = ({ player }) => {
   }, [player]); // Only depend on player
 
   const makeMove = (row, col, letter) => {
-    setBoard((prevBoard) => {
-      const newBoard = prevBoard.map((r) => [...r]);
-      newBoard[row][col] = letter;
-      return newBoard;
-    });
+    const makeMove = (row, col, letter, player) => {
+      const timestamp = new Date().toISOString();
+
+      setBoard((prevBoard) => {
+        const newBoard = prevBoard.map((r) => r.map((cell) => ({ ...cell }))); // deep copy
+        if (!newBoard[row][col].letter) {
+          newBoard[row][col] = {
+            letter,
+            player,
+          };
+        }
+        return newBoard;
+      });
+    };
 
     if (socket) {
-      socket.emit("make_move", { gameId, row, col, letter, player });
+      socket.emit("make_move", { gameId, row, col, letter, player, timeLeft });
     }
   };
 
@@ -88,6 +121,7 @@ const useGameSocket = ({ player }) => {
     activeUsers,
     opponentUser,
     currentTurn,
+    timeLeft,
   };
 };
 
