@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require("uuid");
 module.exports = function (io) {
   const userSocketMap = [];
   const gameRooms = {}; // { roomId: [socketId1, socketId2] }
+  const activeTimers = {}; // { gameId: { intervalId, timeLeft } }
 
   io.on("connection", async (socket) => {
     const userId = socket.handshake.query.userId;
@@ -88,60 +89,107 @@ module.exports = function (io) {
                 [player1UserId]: 0,
                 [player2UserId]: 0,
               },
-              board: Array(3).fill(null).map(() => Array(3).fill(null)), // <-- Add this!
+              board: Array(3)
+                .fill(null)
+                .map(() => Array(3).fill({ letter: "", player: null })),
             });
 
-            await newGame.save(); // Don't forget to save the game to MongoDB
+            await newGame.save();
+            startTurnTimer(io, newGame, newGame._id);
+
             console.log("Game successfully stored:", newGame._id);
           } catch (error) {
             console.log("Error storing game", error);
           }
-          io.to(player1).emit("game_ready", player2Username);
-          io.to(player2).emit("game_ready", player1Username);
+
+          io.to(player1).emit(
+            "game_ready",
+            {
+              username: player2Username,
+              userId: player2UserId,
+            },
+            player1UserId
+          );
+          io.to(player2).emit(
+            "game_ready",
+            {
+              username: player1Username,
+              userId: player1UserId,
+            },
+            player1UserId
+          );
         }
       });
 
-      socket.on("make_move", async ({ gameId, row, col, letter, player }) => {
-        try {
-          const game = await Game.findById(gameId);
-          if (!game) {
-            console.error(`❌ Game not found: ${gameId}`);
-            return;
+      socket.on(
+        "make_move",
+        async ({ gameId, row, col, letter, player, timeLeft }) => {
+          try {
+            const game = await Game.findById(gameId);
+            if (!game) {
+              console.error(`❌ Game not found: ${gameId}`);
+              return;
+            }
+
+            // Ensure it's the player's turn
+            if (game.currentTurn !== player) {
+              console.warn(`⛔ Not ${player}'s turn`);
+              return;
+            }
+
+            const board = game.board;
+
+            // Validate cell and prevent overwrite
+            if (!board[row][col].letter) {
+              // Update cell with move
+              board[row][col] = {
+                letter,
+                player,
+              };
+
+              // TODO: Optional - update score based on SOS logic here
+              // Check for valid SOS and get the points earned
+              const [pointsEarned, sosSequences] = checkSOS(
+                board,
+                row,
+                col,
+                timeLeft
+              );
+
+              // Update the score if SOS is found
+              if (pointsEarned) {
+                updateScore(game, player, pointsEarned);
+              }
+
+              // Change turn to the other player
+              const otherPlayer = game.players.find((p) => p !== player);
+              game.currentTurn = otherPlayer;
+
+              // Save updated game
+              await game.save();
+
+              // Emit updated game state to players
+              io.to(gameId).emit("update_board", {
+                board: game.board,
+                currentTurn: game.currentTurn,
+                scores: Object.fromEntries(game.scores),
+                timeLeft: 15,
+                sosSequences
+              });
+
+              // Restart the timer for the next player
+              const updatedGame = await Game.findById(gameId);
+              startTurnTimer(io, updatedGame, gameId);
+
+              console.log(`✅ Move updated: ${player} at (${row}, ${col})`);
+            } else {
+              console.warn(`⚠️ Cell already occupied: (${row}, ${col})`);
+            }
+          } catch (err) {
+            console.error("💥 Error handling make_move:", err);
           }
-
-          // Ensure it's the player's turn
-          if (game.currentTurn !== player) {
-            console.warn(`⛔ Not ${player}'s turn`);
-            return;
-          }
-
-          const board = game.board;
-          if (!board[row][col]) {
-            board[row][col] = letter;
-            // Optional: score logic can go here
-            // if (letter forms SOS) { game.scores.set(player, (game.scores.get(player) || 0) + 1); }
-
-            // Change turn to other player
-            const otherPlayer = game.players.find((p) => p !== player);
-            game.currentTurn = otherPlayer;
-
-            // Save updated game
-            await game.save();
-
-            io.to(game._id).emit("update_board", {
-              board: game.board,
-              currentTurn: game.currentTurn,
-              scores: Object.fromEntries(game.scores),
-            });
-
-            console.log(`✅ Move updated: ${player} at (${row}, ${col})`);
-          } else {
-            console.warn(`⚠️ Cell already occupied: (${row}, ${col})`);
-          }
-        } catch (err) {
-          console.error("💥 Error handling make_move:", err);
         }
-      });
+      );
 
       socket.on("disconnect", () => {
         console.log("❌ User disconnected:", socket.id);
@@ -166,6 +214,8 @@ module.exports = function (io) {
             console.log(`🚪 ${socket.id} left ${roomId}`);
             if (players.length === 0) {
               delete gameRooms[roomId];
+              clearInterval(activeTimers[roomId]?.intervalId);
+              delete activeTimers[roomId];
             }
             break;
           }
@@ -173,4 +223,87 @@ module.exports = function (io) {
       });
     }
   });
+
+  // Timer function inside the module
+  function startTurnTimer(io, game, gameId) {
+    let timeLeft = 15;
+
+    // Clear any existing timer for this game
+    if (activeTimers[gameId]) {
+      clearInterval(activeTimers[gameId].intervalId);
+    }
+
+    // Start the timer when the current player is expected to make a move
+    const intervalId = setInterval(async () => {
+      timeLeft--;
+
+      // Emit the current time left to players
+      io.to(gameId).emit("timer_tick", timeLeft);
+
+      // If time runs out
+      if (timeLeft <= 0) {
+        clearInterval(intervalId);
+      }
+    }, 1000);
+
+    activeTimers[gameId] = {
+      intervalId,
+      timeLeft,
+    };
+  }
+};
+
+// Helper function to check for SOS sequences and calculate points
+const checkSOS = (board, row, col, timeLeft) => {
+  let basePoints = 0;
+  const sosSequences = [];
+  const directions = [
+    { dr: 0, dc: 1 },
+    { dr: 1, dc: 0 },
+    { dr: 1, dc: 1 },
+    { dr: 1, dc: -1 },
+  ];
+
+  directions.forEach(({ dr, dc }) => {
+    for (let i = -2; i <= 0; i++) {
+      const sequence = [
+        { r: row + i * dr, c: col + i * dc },
+        { r: row + (i + 1) * dr, c: col + (i + 1) * dc },
+        { r: row + (i + 2) * dr, c: col + (i + 2) * dc },
+      ];
+
+      if (
+        sequence.every(
+          ({ r, c }) =>
+            r >= 0 && r < board.length && c >= 0 && c < board[0].length
+        )
+      ) {
+        const letters = sequence.map(({ r, c }) => board[r][c].letter);
+        if (letters.join("") === "SOS") {
+          basePoints += 1;
+          sosSequences.push(sequence); // track positions
+        }
+      }
+    }
+  });
+
+  let timeBonus = 0;
+  if (basePoints > 0) {
+    if (timeLeft >= 14) timeBonus = 5;
+    else if (timeLeft >= 12) timeBonus = 4;
+    else if (timeLeft >= 9) timeBonus = 3;
+    else if (timeLeft >= 6) timeBonus = 2;
+    else if (timeLeft >= 3) timeBonus = 1;
+  }
+
+  const totalPoints = basePoints > 0 ? basePoints + timeBonus : 0;
+
+  return { totalPoints, sosSequences };
+};
+
+// Helper function to update the player's score
+const updateScore = (game, player, points) => {
+  // Update the score of the player
+  const currentScore = game.scores.get(player) || 0;
+  game.scores.set(player, currentScore + points);
 };
