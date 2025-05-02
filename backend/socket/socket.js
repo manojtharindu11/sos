@@ -149,11 +149,21 @@ module.exports = function (io) {
 
               // TODO: Optional - update score based on SOS logic here
               // Check for valid SOS and get the points earned
-              const pointsEarned = checkSOS(board, row, col, timeLeft);
+              let { totalPoints, winningCells } = checkSOS(
+                board,
+                row,
+                col,
+                timeLeft
+              );
+
+              winningCells = winningCells.map((prev) => ({
+                ...prev,
+                player: game.currentTurn,
+              }));
 
               // Update the score if SOS is found
-              if (pointsEarned) {
-                updateScore(game, player, pointsEarned);
+              if (totalPoints) {
+                updateScore(game, player, totalPoints);
               }
 
               // Change turn to the other player
@@ -169,6 +179,7 @@ module.exports = function (io) {
                 currentTurn: game.currentTurn,
                 scores: Object.fromEntries(game.scores),
                 timeLeft: 15,
+                winningCells,
               });
 
               // Restart the timer for the next player
@@ -249,7 +260,9 @@ module.exports = function (io) {
 
 // Helper function to check for SOS sequences and calculate points
 const checkSOS = (board, row, col, timeLeft) => {
+  const winningCellsSet = new Set();
   let basePoints = 0;
+
   const directions = [
     { dr: 0, dc: 1 }, // Horizontal
     { dr: 1, dc: 0 }, // Vertical
@@ -261,7 +274,6 @@ const checkSOS = (board, row, col, timeLeft) => {
     `🔍 Checking SOS from cell (${row}, ${col}) with timeLeft: ${timeLeft}`
   );
 
-  // Check all directions for SOS sequences
   directions.forEach(({ dr, dc }) => {
     for (let i = -2; i <= 0; i++) {
       const sequence = [
@@ -270,7 +282,6 @@ const checkSOS = (board, row, col, timeLeft) => {
         { r: row + (i + 2) * dr, c: col + (i + 2) * dc },
       ];
 
-      // Validate boundaries
       if (
         sequence.every(
           ({ r, c }) =>
@@ -279,17 +290,21 @@ const checkSOS = (board, row, col, timeLeft) => {
       ) {
         const letters = sequence.map(({ r, c }) => board[r][c].letter);
         const formed = letters.join("");
+
         if (formed === "SOS") {
           basePoints += 1;
           console.log(
             `✅ Found SOS at (${sequence[0].r}, ${sequence[0].c}) → (${sequence[2].r}, ${sequence[2].c})`
           );
+          sequence.forEach(({ r, c }) => {
+            winningCellsSet.add(`${r},${c}`);
+          });
         }
       }
     }
   });
 
-  // Only apply time bonus if there is at least one SOS
+  // Calculate time bonus
   let timeBonus = 0;
   if (basePoints > 0) {
     if (timeLeft >= 14) timeBonus = 5;
@@ -305,7 +320,13 @@ const checkSOS = (board, row, col, timeLeft) => {
     `🎯 Base Points: ${basePoints}, Time Bonus: ${timeBonus}, Total: ${totalPoints}`
   );
 
-  return totalPoints;
+  // Convert set back to array of {r, c} objects
+  const winningCells = Array.from(winningCellsSet).map((str) => {
+    const [r, c] = str.split(",").map(Number);
+    return { r, c };
+  });
+
+  return { totalPoints, winningCells };
 };
 
 // Helper function to update the player's score

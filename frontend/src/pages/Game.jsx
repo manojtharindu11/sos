@@ -35,6 +35,7 @@ function Game() {
     opponentUser,
     currentTurn,
     timeLeft,
+    totalWinningCells,
   } = useGameSocket({
     player,
   });
@@ -90,6 +91,7 @@ function Game() {
               <LetterSelector letter={letter} setLetter={setLetter} />
               <GameBoard
                 board={board}
+                userId={player}
                 currentTurn={currentTurn}
                 player1={player}
                 onCellClick={(row, col) => {
@@ -98,6 +100,7 @@ function Game() {
                   }
                   makeMove(row, col, letter);
                 }}
+                totalWinningCells={totalWinningCells}
               />
               <Flex justifyContent="space-around" width="100%" mt={4}>
                 <Text fontWeight="bold">My Score: {score.Player1}</Text>

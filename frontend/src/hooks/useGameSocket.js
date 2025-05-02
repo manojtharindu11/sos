@@ -20,6 +20,7 @@ const useGameSocket = ({ player }) => {
   });
   const [currentTurn, setCurrentTurn] = useState(false);
   const [timeLeft, setTimeLeft] = useState(15);
+  const [totalWinningCells, setTotalWinningCells] = useState([]);
 
   useEffect(() => {
     if (player !== undefined && !socket) {
@@ -50,18 +51,25 @@ const useGameSocket = ({ player }) => {
         console.log(opponentUser);
       });
 
-      socket.on("update_board", ({ board, currentTurn, scores, timeLeft }) => {
-        console.log(board)
-        setBoard(board);
-        setCurrentTurn(currentTurn == player ? true : false);
-        setScore({
-          Player1: scores[player],
-          Player2: Object.keys(scores).find((key) => key !== player)
-            ? scores[Object.keys(scores).find((key) => key !== player)]
-            : 0,
-        });
-        setTimeLeft(timeLeft);
-      });
+      socket.on(
+        "update_board",
+        ({ board, currentTurn, scores, timeLeft, winningCells }) => {
+          console.log(board);
+          setBoard(board);
+          setCurrentTurn(currentTurn == player ? true : false);
+          setScore({
+            Player1: scores[player],
+            Player2: Object.keys(scores).find((key) => key !== player)
+              ? scores[Object.keys(scores).find((key) => key !== player)]
+              : 0,
+          });
+          setTimeLeft(timeLeft);
+          setTotalWinningCells((prevWinningCells) => [
+            ...prevWinningCells,
+            ...winningCells,
+          ]);
+        }
+      );
 
       socket.on("timer_tick", (timeLeft) => {
         setTimeLeft(timeLeft);
@@ -118,6 +126,7 @@ const useGameSocket = ({ player }) => {
     opponentUser,
     currentTurn,
     timeLeft,
+    totalWinningCells,
   };
 };
 
