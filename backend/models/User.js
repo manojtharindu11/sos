@@ -22,6 +22,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
+  finalScore: {
+    type: Number,
+    default: 0,
+  },
+  numberOfContest: {
+    type: Number,
+    default: 0,
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);
