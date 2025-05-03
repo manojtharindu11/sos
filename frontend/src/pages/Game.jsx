@@ -9,13 +9,13 @@ import {
   Divider,
 } from "@chakra-ui/react";
 import useGameSocket from "../hooks/useGameSocket";
-import GameBoard from "../components/GameBoard";
-import LetterSelector from "../components/LetterSelector";
+import GameBoard from "../components/gameBoard";
+import LetterSelector from "../components/letterSelector";
 import { UserContext } from "../context/userContext";
-import AllPlayers from "../components/AllPlayers";
-import ProfileCard from "../components/ProfileCard";
-import Timer from "../components/Timer";
-import GameOver from "../components/GameOver";
+import AllPlayers from "../components/allPlayers";
+import ProfileCard from "../components/profileCard";
+import Timer from "../components/timer";
+import GameOver from "../components/gameOver";
 
 function Game() {
   const { user } = useContext(UserContext);
