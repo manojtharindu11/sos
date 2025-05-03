@@ -111,8 +111,36 @@ const useGameSocket = ({ player }) => {
     socket.emit("game_started", { player });
   };
 
+  const gameOver = (winner) => {
+    if (opponentUser.username == winner) {
+      console.log(gameId, winner);
+      const scores = [
+        { player: player, score: score.Player1 },
+        { player: opponentUser.userId, score: score.Player2 },
+      ];
+      socket.emit("game_over", { gameId, winner, scores });
+    }
+  };
+
+  const restartGame = () => {
+    setBoard(
+      Array.from({ length: boardSize }, () =>
+        Array.from({ length: boardSize }, () => ({ letter: "", player: null }))
+      )
+    );
+    setOpponentUser({
+      username: "",
+      userId: "",
+    });
+    setTotalWinningCells([]);
+    setTimeLeft(15);
+    setScore({ Player1: 0, Player2: 0 });
+  };
+
   return {
     startGame,
+    gameOver,
+    restartGame,
     board,
     makeMove,
     score,
