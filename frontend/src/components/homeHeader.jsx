@@ -1,16 +1,8 @@
 import React, { useState } from "react";
-import {
-  Flex,
-  Heading,
-  HStack,
-  Button,
-  Spacer,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-} from "@chakra-ui/react";
+import { Flex, Heading, HStack, Button, Spacer } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { isAuthenticated, logout } from "../api/auth";
+import BreadcrumbNav from "./breadcrumbNav";
 
 function HomeHeader() {
   const navigate = useNavigate();
@@ -86,15 +78,7 @@ function HomeHeader() {
 
   return (
     <>
-      <Breadcrumb mb={4}>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="#"></BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/">home</BreadcrumbLink>
-        </BreadcrumbItem>
-      </Breadcrumb>
-
+      <BreadcrumbNav />
       <Flex align="center" mb={10}>
         <Heading size="lg" color="blue.600">
           SOS Game
