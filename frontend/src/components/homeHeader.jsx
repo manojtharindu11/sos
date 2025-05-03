@@ -1,16 +1,21 @@
 import React, { useState } from "react";
 import { Flex, Heading, HStack, Button, Spacer } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { isAuthenticated, logout } from "../api/auth";
+import { isAuthenticated } from "../api/auth";
 import BreadcrumbNav from "./breadcrumbNav";
+import {
+  cancelButtonStyle,
+  getLogoutButtonStyle,
+  submitButtonStyle,
+} from "../styles/commonStyles";
 
 function HomeHeader() {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
+  const logoutButtonStyle = getLogoutButtonStyle(isHovered);
 
   const handleLogOut = () => {
-    logout();
-    navigate("/login");
+    navigate("/home/logout");
   };
 
   const handleButtonView = () => {
@@ -23,44 +28,14 @@ function HomeHeader() {
     );
   };
 
-  const logoutButtonStyle = {
-    backgroundColor: isHovered ? "white" : "#f56565",
-    color: isHovered ? "#f56565" : "white",
-    border: "1px solid",
-    borderColor: isHovered ? "#f56565" : "transparent",
-    transition: "all 0.2s ease-in-out",
-    transform: isHovered ? "scale(1.03)" : "scale(1)",
-  };
-
   const loginButton = (
-    <Button
-      colorScheme="blue"
-      variant="outline"
-      _hover={{
-        bg: "blue.500",
-        color: "white",
-        borderColor: "blue.500",
-        transform: "scale(1.03)",
-      }}
-      transition="all 0.2s ease-in-out"
-      onClick={() => navigate("/login")}
-    >
+    <Button {...cancelButtonStyle} onClick={() => navigate("/home/login")}>
       Log In
     </Button>
   );
 
   const signupButton = (
-    <Button
-      colorScheme="blue"
-      bg="blue.500"
-      color="white"
-      _hover={{
-        bg: "blue.600",
-        transform: "scale(1.03)",
-      }}
-      transition="all 0.2s ease-in-out"
-      onClick={() => navigate("/signup")}
-    >
+    <Button {...submitButtonStyle} onClick={() => navigate("/home/signup")}>
       Sign Up
     </Button>
   );
