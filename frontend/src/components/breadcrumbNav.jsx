@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@chakra-ui/react";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -7,10 +7,6 @@ const BreadcrumbNav = () => {
   const location = useLocation();
 
   const pathnames = location.pathname.split("/").filter((x) => x);
-
-  useEffect(() => {
-    console.log(pathnames);
-  }, []);
 
   const handleBack = () => {
     navigate(-1); // navigate to previous page
