@@ -27,7 +27,7 @@ function HomeHeader() {
         {loginButton} {signupButton}
       </>
     ) : (
-      { logoutButton }
+      logoutButton
     );
   };
 
