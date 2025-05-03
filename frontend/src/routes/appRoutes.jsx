@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
 import Home from "./../pages/Home";
 import Login from "./../pages/Login";
 import Signup from "./../pages/Signup";
@@ -11,7 +16,7 @@ function AppRoutes() {
     <>
       <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
           <Route
             path="/signup"
             element={
@@ -36,7 +41,7 @@ function AppRoutes() {
               </AuthProtectedRoute>
             }
           />
-          <Route path="*" element={<Home />} />
+          <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
       </Router>
     </>
