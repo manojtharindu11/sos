@@ -16,12 +16,13 @@ import {
   TabPanel,
 } from "@chakra-ui/react";
 import { FaCheckCircle } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import HomeHeader from "../components/homeHeader";
 import { isAuthenticated } from "../api/auth";
 
 function Home() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [defaultIndex, setDefaultIndex] = useState(0);
 
   useEffect(() => {
@@ -30,7 +31,7 @@ function Home() {
     } else {
       setDefaultIndex(0);
     }
-  }, []);
+  }, [location.pathname]);
 
   const getStartedButton = (
     <Button
