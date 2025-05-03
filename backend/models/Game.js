@@ -18,6 +18,7 @@ const gameSchema = new mongoose.Schema({
     of: Number,
     default: {},
   },
+  winner: String
 });
 
 module.exports = mongoose.model("Game", gameSchema);
