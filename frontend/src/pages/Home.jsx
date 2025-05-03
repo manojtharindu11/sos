@@ -12,6 +12,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { isAuthenticated, logout } from "../api/auth";
+import { transform } from "framer-motion";
 
 function Home() {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ function Home() {
     border: "1px solid",
     borderColor: isHovered ? "#f56565" : "transparent", // Change on hover
     transition: "all 0.2s ease-in-out", // Smooth transition
+    transform: isHovered ? "scale(1.03)": "scale(1)"
   };
 
   return (
@@ -53,6 +55,7 @@ function Home() {
                     bg: "blue.500",
                     color: "white",
                     borderColor: "blue.500",
+                    transform: "scale(1.03)",
                   }}
                   transition="all 0.2s ease-in-out"
                   onClick={() => navigate("/login")}
@@ -64,10 +67,8 @@ function Home() {
                   bg="blue.500"
                   color="white"
                   _hover={{
-                    bg: "white",
-                    color: "blue.500", // <-- Fixed here
-                    border: "1px solid",
-                    borderColor: "blue.500",
+                    bg: "blue.600",
+                    transform: "scale(1.03)",
                   }}
                   transition="all 0.2s ease-in-out"
                   onClick={() => navigate("/signup")}
@@ -110,6 +111,7 @@ function Home() {
             colorScheme="blue"
             bg="blue.500"
             color="white"
+            marginLeft={0}
             _hover={{
               bg: "blue.600",
               transform: "scale(1.03)",
