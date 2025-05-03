@@ -6,7 +6,7 @@ import {
   Button,
   Flex,
   VStack,
-  Divider,
+  Container,
 } from "@chakra-ui/react";
 import useGameSocket from "../hooks/useGameSocket";
 import GameBoard from "../components/gameBoard";
@@ -16,6 +16,7 @@ import AllPlayers from "../components/allPlayers";
 import ProfileCard from "../components/profileCard";
 import Timer from "../components/timer";
 import GameOver from "../components/gameOver";
+import BreadcrumbNav from "../components/breadcrumbNav";
 
 function Game() {
   const { user } = useContext(UserContext);
@@ -85,81 +86,108 @@ function Game() {
   };
 
   return (
-    <Flex
-      minHeight="100vh"
-      p={6}
-      bg="gray.50"
-      direction="column"
-      align="center"
-    >
-      <Box mb={8}>
-        <ProfileCard />
-      </Box>
-
-      <Flex width="100%" maxW="1200px" gap={8}>
-        {/* Left Side - Active Players */}
-        <Box flex="1" bg="white" p={4} rounded="md" shadow="md">
-          <Heading size="md" mb={4}>
-            Active Players
-          </Heading>
-          <AllPlayers activeUsers={activeUsers} />
-        </Box>
-
-        {/* Right Side - Game */}
-        <Box
-          flex="2"
-          bg="white"
-          p={6}
-          rounded="md"
-          shadow="md"
-          textAlign="center"
+    <Box minH="100vh" bg="gray.50" py={12}>
+      <Container maxW="container.lg">
+      <BreadcrumbNav />
+        <Flex
+          direction="column"
+          align="center"
+          justify="center"
+          py={4}
         >
-          {!isGameStarted ? (
-            <>
-              <Heading size="lg" mb={6}>
-                Welcome to the SOS Game!
+          <ProfileCard />
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            gap={8}
+            width="100%"
+            my={6}
+            justify="space-between"
+          >
+            {/* Left Side - Active Players */}
+            <Box
+              flex="1"
+              bg="white"
+              p={4}
+              rounded="md"
+              shadow="md"
+              minW="280px"
+            >
+              <Heading size="md" mb={4}>
+                Active Players
               </Heading>
-              <Button colorScheme="teal" size="lg" onClick={handleStartGame}>
-                Start Playing
-              </Button>
-            </>
-          ) : opponentUser.username !== "" ? (
-            <VStack spacing={6}>
-              <Heading size="lg">SOS Game</Heading>
-              {!isGameOver ? (
+              <AllPlayers activeUsers={activeUsers} />
+            </Box>
+
+            {/* Right Side - Game */}
+            <Box
+              flex="2"
+              bg="white"
+              p={6}
+              rounded="md"
+              shadow="md"
+              textAlign="center"
+              minW="300px"
+            >
+              {!isGameStarted ? (
                 <>
-                  <Timer currentTurn={currentTurn} timeLeft={timeLeft} />
-                  <LetterSelector letter={letter} setLetter={setLetter} />
-                  <GameBoard
-                    board={board}
-                    userId={player}
-                    currentTurn={currentTurn}
-                    player1={player}
-                    onCellClick={(row, col) => {
-                      if (!currentTurn) {
-                        return;
-                      }
-                      makeMove(row, col, letter);
-                    }}
-                    totalWinningCells={totalWinningCells}
-                  />
+                  <Heading size="lg" mb={6}>
+                    Welcome to the SOS Game!
+                  </Heading>
+                  <Button
+                    colorScheme="teal"
+                    size="lg"
+                    onClick={handleStartGame}
+                    _hover={{ bg: "teal.500", transform: "scale(1.05)" }}
+                    transition="all 0.3s ease"
+                  >
+                    Start Playing
+                  </Button>
                 </>
+              ) : opponentUser.username !== "" ? (
+                <VStack spacing={6}>
+                  <Heading size="lg">SOS Game</Heading>
+                  {!isGameOver ? (
+                    <>
+                      <Timer currentTurn={currentTurn} timeLeft={timeLeft} />
+                      <LetterSelector letter={letter} setLetter={setLetter} />
+                      <GameBoard
+                        board={board}
+                        userId={player}
+                        currentTurn={currentTurn}
+                        player1={player}
+                        onCellClick={(row, col) => {
+                          if (!currentTurn) {
+                            return;
+                          }
+                          makeMove(row, col, letter);
+                        }}
+                        totalWinningCells={totalWinningCells}
+                      />
+                    </>
+                  ) : (
+                    <GameOver winner={winner} onRestart={handleRestart} />
+                  )}
+                  <Flex
+                    justifyContent="space-between"
+                    width="100%"
+                    mt={4}
+                    fontWeight="semibold"
+                    color="gray.700"
+                  >
+                    <Text>My Score: {score.Player1}</Text>
+                    <Text>
+                      {opponentUser.username} Score: {score.Player2}
+                    </Text>
+                  </Flex>
+                </VStack>
               ) : (
-                <GameOver winner={winner} onRestart={handleRestart} />
+                <Text>Loading opponent...</Text>
               )}
-              <Flex justifyContent="space-around" width="100%" mt={4}>
-                <Text fontWeight="bold">My Score: {score.Player1}</Text>
-                <Text fontWeight="bold">
-                  {opponentUser.username} Score: {score.Player2}
-                </Text>
-              </Flex>
-            </VStack>
-          ) : (
-            <Text>Loading opponent...</Text>
-          )}
-        </Box>
-      </Flex>
-    </Flex>
+            </Box>
+          </Flex>
+        </Flex>
+      </Container>
+    </Box>
   );
 }
 
