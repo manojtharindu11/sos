@@ -34,16 +34,16 @@ function ProfileCard() {
     },
     {
       label: "Profile",
-      route: "/profile",
+      route: "#",
     },
     {
       label: "Leaderboard",
-      route: "/leaderboard",
+      route: "#",
     },
   ];
 
   const displayNavigation = navLinks.map((link) => (
-    <Button key={link.route} variant="link" as={NavLink} to={link.route}>
+    <Button key={link.label} variant="link" as={NavLink} to={link.route}>
       {link.label}
     </Button>
   ));
