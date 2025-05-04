@@ -1,26 +1,52 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import {
   Box,
   Flex,
   Avatar,
   Text,
   Badge,
-  Spacer,
   useColorModeValue,
   Button,
 } from "@chakra-ui/react";
 import { UserContext } from "../context/userContext";
 import { NavLink } from "react-router-dom"; // Import NavLink for navigation
+import { decodedToken } from "../utils/token";
 
 function ProfileCard() {
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
+
+  useEffect(() => {
+    const decoded = decodedToken();
+    if (decoded) {
+      setUser(decoded);
+    }
+  }, []);
 
   const bg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const textColor = useColorModeValue("gray.600", "gray.400");
   const strongTextColor = useColorModeValue("gray.700", "white");
 
-  if (!user) return null;
+  const navLinks = [
+    {
+      label: "Home",
+      route: "/home",
+    },
+    {
+      label: "Profile",
+      route: "/profile",
+    },
+    {
+      label: "Leaderboard",
+      route: "/leaderboard",
+    },
+  ];
+
+  const displayNavigation = navLinks.map((link) => (
+    <Button key={link.route} variant="link" as={NavLink} to={link.route}>
+      {link.label}
+    </Button>
+  ));
 
   return (
     <Box
@@ -47,8 +73,8 @@ function ProfileCard() {
         <Flex align="center" minW="0">
           <Avatar
             size="md"
-            name={user.username}
-            src={user.avatarUrl || ""}
+            name={user?.username}
+            src={user?.avatarUrl || ""}
             mr={3}
           />
           <Box minW="0">
@@ -58,12 +84,12 @@ function ProfileCard() {
               color={strongTextColor}
               isTruncated
             >
-              {user.username}
+              {user?.username}
             </Text>
             <Text fontSize="sm" color={textColor}>
               Rank:{" "}
               <Badge colorScheme="blue" ml={1}>
-                {user.rank || "Unranked"}
+                {user?.rank || "Unranked"}
               </Badge>
             </Text>
           </Box>
@@ -76,7 +102,7 @@ function ProfileCard() {
             </Text>
             <Text fontWeight="semibold" textAlign="center" fontSize="lg">
               <Badge colorScheme="green" fontSize="1em">
-                {user.score || 0}
+                {user?.score || 0}
               </Badge>
             </Text>
           </Box>
@@ -89,15 +115,7 @@ function ProfileCard() {
           fontSize="lg"
           color={textColor}
         >
-          <Button variant="link" as={NavLink} to="/home">
-            Home
-          </Button>
-          <Button variant="link" as={NavLink} to="/profile">
-            Profile
-          </Button>
-          <Button variant="link" as={NavLink} to="/leaderboard">
-            Leaderboard
-          </Button>
+          {displayNavigation}
         </Flex>
       </Flex>
     </Box>
