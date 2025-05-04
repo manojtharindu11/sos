@@ -47,6 +47,17 @@ function AppRoutes() {
     />
   );
 
+  const startedGameRoute = (
+    <Route
+      path=":id"
+      element={
+        <AuthProtectedRoute onlyPublic={false}>
+          <Game />
+        </AuthProtectedRoute>
+      }
+    />
+  );
+
   return (
     <Router>
       <Routes>
@@ -57,6 +68,16 @@ function AppRoutes() {
         </Route>
         <Route
           path="/game"
+          element={
+            <AuthProtectedRoute onlyPublic={false}>
+              <Game />
+            </AuthProtectedRoute>
+          }
+        >
+          {startedGameRoute}
+        </Route>
+        <Route
+          path="/game/:id"
           element={
             <AuthProtectedRoute onlyPublic={false}>
               <Game />
