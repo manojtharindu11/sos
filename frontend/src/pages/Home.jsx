@@ -47,7 +47,9 @@ function Home() {
         boxShadow: "lg",
       }}
       transition="all 0.2s ease-in-out"
-      onClick={() => navigate("/game")}
+      onClick={() => {
+        isAuthenticated() ? navigate("/game") : navigate("/home/login");
+      }}
     >
       Get Started
     </Button>
