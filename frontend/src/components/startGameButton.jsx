@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { FaPlayCircle } from "react-icons/fa";
 
-function StartGameButton({ onStartGame }) {
+function StartGameButton({ onStartGame, isDisable }) {
   const buttonSize = useBreakpointValue({ base: "md", md: "lg" });
   const headingSize = useBreakpointValue({ base: "md", md: "lg" });
 
@@ -64,6 +64,7 @@ function StartGameButton({ onStartGame }) {
         transition="all 0.3s ease"
         px={6}
         fontSize={{ base: "lg", md: "xl" }}
+        isDisabled={isDisable}
       >
         Start Game
       </Button>
