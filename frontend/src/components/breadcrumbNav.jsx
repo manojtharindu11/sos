@@ -34,7 +34,7 @@ const BreadcrumbNav = () => {
     <Breadcrumb mb={4}>
       <BreadcrumbItem>
         <BreadcrumbLink onClick={handleBack}>..</BreadcrumbLink>
-      </BreadcrumbItem>
+      </BreadcrumbItem >
 
       {generateBreadCrumpItems}
     </Breadcrumb>
