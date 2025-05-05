@@ -6,7 +6,7 @@ import MobileBlocker from "./components/mobileBlocker";
 import { useMediaQuery } from "@chakra-ui/react";
 
 function App() {
-  const [isMobile] = useMediaQuery("(max-width: 1100px)");
+  const [isMobile] = useMediaQuery("(max-width: 700px)");
 
   const displayContent = isMobile ? <MobileBlocker /> : <AppRoutes />;
 
