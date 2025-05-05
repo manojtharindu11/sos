@@ -6,7 +6,12 @@ function Timer({ currentTurn, timeLeft }) {
   const lastToastTime = useRef(null);
 
   useEffect(() => {
-    if (timeLeft <= 3 && timeLeft > 0 && lastToastTime.current !== timeLeft) {
+    if (
+      currentTurn &&
+      timeLeft <= 3 &&
+      timeLeft > 0 &&
+      lastToastTime.current !== timeLeft
+    ) {
       toast({
         title: `⏳ Hurry up!`,
         description: `Only ${timeLeft} second${
