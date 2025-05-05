@@ -138,6 +138,7 @@ const useGameSocket = ({ player }) => {
   };
 
   return {
+    gameId,
     startGame,
     gameOver,
     restartGame,
