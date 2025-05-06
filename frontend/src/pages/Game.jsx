@@ -16,7 +16,7 @@ import GameBoard from "../components/GameBoard";
 import LetterSelector from "../components/LetterSelector";
 import { UserContext } from "../context/userContext";
 import ProfileCard from "../components/ProfileCard";
-import Timer from "../components/timer";
+import Timer from "../components/Timer";
 import GameOver from "../components/GameOver";
 import BreadcrumbNav from "../components/BreadcrumbNav";
 import ActivePlayers from "../components/ActivePlayers";
