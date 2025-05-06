@@ -1,26 +1,27 @@
 # 🆘 SOS Game
 
-The **Multiplayer SOS Game** is a digital version of the classic "SOS" word game built for real-time competitive play. Two players compete on a grid by taking turns to place the letters **S** or **O**, aiming to form the sequence "SOS" horizontally, vertically, or diagonally to earn points. The game tracks performance, maintains user rankings, and handles secure session management using JWT tokens.
+The **Multiplayer SOS Game** is a digital adaptation of the classic "SOS" game designed for real-time, competitive play. Two players compete by taking turns placing **S** or **O** on a grid, aiming to form the sequence "SOS" horizontally, vertically, or diagonally. The system tracks scores, manages user sessions securely using JWT, and ranks players based on performance.
 
 ---
 
 ## 🎮 Game Rules
 
-- Players alternate turns.
-- A player selects an empty grid cell on each turn and places either **"S"** or **"O"**.
-- Forming the sequence **"SOS"** in any direction awards a point.
-- The game ends when the board is full. The player with the most points wins.
+- Two players alternate turns.
+- Each player chooses an empty grid cell and places either **"S"** or **"O"**.
+- Forming "SOS" in any direction earns a point.
+- The game ends when the board is full.
+- The player with the highest score wins.
 
 ---
 
 ## 🚀 Features
 
-- 🧑‍🤝‍🧑 Real-time multiplayer gameplay
-- 🎯 Scoring based on successful "SOS" formations
-- 📊 Dynamic player ranking based on performance
-- 🔐 JWT authentication with refresh token support
-- 🧠 Performance formula: `finalScore / numberOfContexts`
-- 🗂️ Game history and leaderboard
+- 🧑‍🤝‍🧑 Real-time multiplayer gameplay (via Socket.IO)
+- 🎯 Scoring system for successful "SOS" formations
+- 📊 Dynamic leaderboard and ranking
+- 🔐 JWT-based authentication with refresh token handling
+- 🧠 Performance-based ranking: `finalScore / numberOfContexts`
+- 🗂️ Game history tracking and secure session management
 
 ---
 
@@ -29,8 +30,8 @@ The **Multiplayer SOS Game** is a digital version of the classic "SOS" word game
 - **Frontend**: React
 - **Backend**: Node.js, Express.js
 - **WebSocket**: Socket.IO
-- **Database**: MongoDB (Mongoose)
-- **Authentication**: JWT with refresh tokens
+- **Database**: MongoDB (with Mongoose)
+- **Authentication**: JWT + Refresh Tokens
 
 ---
 
@@ -58,122 +59,112 @@ The **Multiplayer SOS Game** is a digital version of the classic "SOS" word game
 ├── backend/
 │   ├── models/         # Mongoose models (User, Game)
 │   ├── controller/     # Game and Auth logic
-│   ├── routes/         # API routes
-│   ├── middleware/     # Authentication, validation, etc.
-│   ├── services/       # Business logic
-│   ├── socket/         # Real-time communication logic
-│   ├── validators/     # Request validation
-│   ├── utils/          # Utility functions (token, ranking, etc.)
+│   ├── routes/         # API endpoints
+│   ├── middleware/     # Auth, error handling, validation
+│   ├── services/       # Game services and logic
+│   ├── socket/         # Real-time game handlers
+│   ├── validators/     # Input validation
+│   ├── utils/          # Token helpers, ranking logic
 │   ├── server.js
 │   ├── package.json
 │   ├── package-lock.json
 │   ├── .env.example
 │   └── .gitignore
 └── README.md
-
 ````
 
 ---
 
 ## 📈 Ranking System
 
-Players are ranked based on:
+Player rankings are calculated based on performance using the formula:
 
 ```txt
-performance = finalScore / numberOfContext
+performance = finalScore / numberOfContexts
 ```
 
-Ranks are calculated and displayed in zero-padded 3-digit format:
+Ranks are displayed using a zero-padded 3-digit format:
 
 | Raw Rank | Displayed |
 | -------- | --------- |
-| 1        | `001`     |
-| 12       | `012`     |
-| 120      | `120`     |
+| 1        | 001       |
+| 12       | 012       |
+| 120      | 120       |
 
 ---
 
 ## 📦 Installation & Setup
 
-1. **Clone the repository**
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/sos-game.git
-cd sos-game
+git clone https://github.com/manojtharindu11/sos
+cd sos
 ```
 
-2. **Install server dependencies**
+### 2. Install dependencies
 
 ```bash
-cd server
+# Frontend
+cd frontend
+npm install
+
+# Backend
+cd ../backend
 npm install
 ```
 
-3. **Create `.env` file**
+### 3. Configure environment variables
+
+#### `.env` (Backend)
 
 ```env
+MONGODB_URI=mongodb://localhost:27017/sosGame
 PORT=5000
-MONGO_URI=your-mongodb-uri
-ACCESS_TOKEN_SECRET=your-secret
-REFRESH_TOKEN_SECRET=your-refresh-secret
+
+FRONTEND_URL=http://localhost:5173
+
+ACCESS_TOKEN_SECRET=yourAccessTokenSecret
+ACCESS_TOKEN_EXPIRY=15m
+REFRESH_TOKEN_SECRET=yourRefreshTokenSecret
+REFRESH_TOKEN_EXPIRY=7d
 ```
 
-4. **Start the server**
+#### `.env` (Frontend)
+
+```env
+VITE_API_URL=http://localhost:5000
+VITE_SOCKET_URL=http://localhost:5000
+```
+
+### 4. Start the development servers
 
 ```bash
+# Backend
+cd backend
 npm start
-```
 
-5. **Install frontend dependencies & run (if applicable)**
-
-```bash
-cd ../client
-npm install
+# Frontend
+cd ../frontend
 npm run dev
-```
-
----
-
-## 📡 Sample API: Get Rank
-
-```http
-GET /api/v1/user/rank/:username
-```
-
-**Response:**
-
-```json
-{
-  "username": "sos_master",
-  "rank": 3,
-  "formattedRank": "003",
-  "totalUsers": 50
-}
 ```
 
 ---
 
 ## 📸 Screenshots *(Optional)*
 
-*Add screenshots or demo GIFs here to showcase UI and gameplay.*
+*Add gameplay or UI screenshots here.*
 
 ---
 
 ## 👨‍💻 Author
 
-**Your Name**
-📧 [your.email@example.com](mailto:your.email@example.com)
-🔗 [GitHub](https://github.com/your-username) | [LinkedIn](https://linkedin.com/in/your-profile)
+**Manoj Thilakarathna**
+📧 [manojtharindu11@gmail.com](mailto:manojtharindu11@gmail.com)
+🔗 [GitHub](https://github.com/manojtharindu11)
 
 ---
 
 ## 🛡️ License
 
 This project is licensed under the MIT License.
-
-```
-
----
-
-Let me know if you'd like to add WebSocket event documentation (like `joinRoom`, `playMove`, `gameOver`) or a visual diagram of game flow.
-```
