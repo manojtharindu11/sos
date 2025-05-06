@@ -1,7 +1,6 @@
 import React from "react";
 import { ChakraProvider } from "@chakra-ui/react";
 import { UserProvider } from "./context/userContext";
-import AppRoutes from "./routes/AppRoutes";
 import MobileBlocker from "./components/mobileBlocker";
 import { useMediaQuery } from "@chakra-ui/react";
 
