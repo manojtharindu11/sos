@@ -10,23 +10,12 @@ const server = http.createServer(app);
 const routes = require("./routes/routes");
 
 // Socket.IO setup
-// const io = new Server(server, {
-//   cors: { origin: process.env.FRONTEND_URL, methods: ["GET", "POST"] },
-// });
-
 const io = new Server(server, {
   cors: {
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "https://sos-game-theta.vercel.app",
-      "https://sos-game-manoj-thilakarathnas-projects.vercel.app/",
-      "https://sos-game-git-main-manoj-thilakarathnas-projects.vercel.app",
-    ],
+    origin: process.env.VITE_FRONTEND_URLS.split(","),
     methods: ["GET", "POST"]
   }
 });
-
 
 // MongoDB Connection
 mongoose
