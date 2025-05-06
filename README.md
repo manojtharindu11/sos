@@ -151,9 +151,13 @@ npm run dev
 
 ---
 
-## 📸 Screenshots *(Optional)*
+## 📸 Screenshots
 
-*Add gameplay or UI screenshots here.*
+![Image](https://github.com/user-attachments/assets/87541ab9-2caf-4529-b816-2a9248e596d7)
+![Image](https://github.com/user-attachments/assets/24d65274-9953-432f-9aff-6bd3eefddda1)
+![Image](https://github.com/user-attachments/assets/8e20d4bf-f74a-4d2b-b4a4-f08c07eeb736)
+![Image](https://github.com/user-attachments/assets/d325ed1c-eb06-4f88-b5a4-c2c71768d184)
+![Image](https://github.com/user-attachments/assets/73adc083-b1d7-47a1-9f91-c8d0c59cca52)
 
 ---
 
