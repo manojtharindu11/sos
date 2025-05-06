@@ -20,7 +20,7 @@ import Timer from "../components/Timer";
 import GameOver from "../components/GameOver";
 import BreadcrumbNav from "../components/breadcrumbNav";
 import ActivePlayers from "../components/ActivePlayers";
-import StartGameButton from "../components/startGameButton";
+import StartGameButton from "../components/StartGameButton";
 
 function Game() {
   const navigate = useNavigate();
