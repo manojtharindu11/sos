@@ -33,7 +33,7 @@ const GameOver = ({ winner, onRestart }) => {
             Game Over
           </Heading>
         </HStack>
-        <Text fontSize="xl" fontWeight="semibold" color="gray.700">
+        <Text fontSize="md" fontWeight="semibold" color="gray.700">
           {isDraw
             ? "🤝 It's a draw! Well played!"
             : `🏆 Congratulations, ${winner}!`}

@@ -151,7 +151,7 @@ function Game() {
       <Container maxW="container.lg">
         <BreadcrumbNav />
         <Flex direction="column" align="center" justify="center" py={4}>
-          <ProfileCard />
+          <ProfileCard winner={winner} />
           <Flex
             direction={{ base: "column", md: "row" }}
             gap={8}
