@@ -9,17 +9,20 @@ const app = express();
 const server = http.createServer(app);
 const routes = require("./routes/routes");
 
-const allowedOrigins = process.env.FRONTEND_URLS.split(","); 
 // Socket.IO setup
+// const io = new Server(server, {
+//   cors: { origin: process.env.FRONTEND_URL, methods: ["GET", "POST"] },
+// });
+
 const io = new Server(server, {
   cors: {
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "https://sos-game-theta.vercel.app",
+      "https://sos-game-git-main-manoj-thilakarathnas-projects.vercel.app",
+      "https://sos-game-qavgb6x0m-manoj-thilakarathnas-projects.vercel.app"
+    ],
     methods: ["GET", "POST"]
   }
 });
