@@ -22,7 +22,9 @@ const refreshToken = async () => {
   try {
     const token = sessionStorage.getItem("refreshToken");
     const response = await axios.post(
-      `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/v1/auth/refresh`,
+      `${
+        import.meta.env.VITE_API_URL || "http://localhost:5000"
+      }/api/v1/auth/refresh`,
       { token: token }
     );
     const newAccessToken = response.data.newAccessToken;
@@ -40,26 +42,25 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
     const status = error.response?.status;
 
-    if (status === 401 && !originalRequest._retry) {
+    if ((status === 401 || status === 403) && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
         const newToken = await refreshToken();
-        axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+        axiosInstance.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${newToken}`;
         originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
         return axiosInstance(originalRequest); // Retry original request
       } catch (err) {
         // Refresh token failed – logout user
         sessionStorage.clear(); // or remove only accessToken and refreshToken
         window.location.href = "/home/login"; // Redirect to login
-        return Promise.reject({ message: "Session expired. Please log in again." });
+        return Promise.reject({
+          message: "Session expired. Please log in again.",
+        });
       }
-    }
-
-    // Other error handling
-    if (status === 403) {
-      alert("You do not have permission to access this resource.");
     } else if (status >= 500) {
-      alert("Server error. Please try again later.");
+      console.log("Server error. Please try again later.");
     } else if (status === 422) {
       const errors = error.response.data.errors;
       for (const err of errors) {
