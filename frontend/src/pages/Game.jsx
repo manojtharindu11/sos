@@ -12,15 +12,15 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import useGameSocket from "../hooks/useGameSocket";
-import GameBoard from "../components/gameBoard";
-import LetterSelector from "../components/letterSelector";
+import GameBoard from "../components/GameBoard";
+import LetterSelector from "../components/LetterSelector";
 import { UserContext } from "../context/userContext";
-import ProfileCard from "../components/profileCard";
+import ProfileCard from "../components/ProfileCard";
 import Timer from "../components/timer";
-import GameOver from "../components/gameOver";
-import BreadcrumbNav from "../components/breadcrumbNav";
-import ActivePlayers from "../components/activePlayers";
-import StartGameButton from "../components/startGameButton";
+import GameOver from "../components/GameOver";
+import BreadcrumbNav from "../components/BreadcrumbNav";
+import ActivePlayers from "../components/ActivePlayers";
+import StartGameButton from "../components/StartGameButton";
 
 function Game() {
   const navigate = useNavigate();
