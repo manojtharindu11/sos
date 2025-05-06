@@ -6,7 +6,7 @@ import { useMediaQuery } from "@chakra-ui/react";
 import AppRoutes from "./routes/appRoutes";
 
 function App() {
-  const [isMobile] = useMediaQuery("(max-width: 700px)");
+  const [isMobile] = useMediaQuery("(max-width: 1100px)");
 
   const displayContent = isMobile ? <MobileBlocker /> : <AppRoutes />;
 
