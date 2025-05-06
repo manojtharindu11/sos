@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
-let socket; // Keep it outside
+let socket;
 
 const useGameSocket = ({ player }) => {
   const [gameId, setGameId] = useState();
@@ -24,7 +24,6 @@ const useGameSocket = ({ player }) => {
 
   useEffect(() => {
     if (player !== undefined && !socket) {
-      // 🔥 Prevent multiple connections
       socket = io(import.meta.env.VITE_SOCKET_URL, {
         query: { userId: player },
       });
@@ -82,16 +81,16 @@ const useGameSocket = ({ player }) => {
         socket.off("update_board");
         socket.off("timer_tick");
         socket.disconnect();
-        socket = null; // 🔥 Important: Set it to null after disconnect
+        socket = null;
         console.log("❌ Socket disconnected.");
       }
     };
-  }, [player]); // Only depend on player
+  }, [player]);
 
   const makeMove = (row, col, letter) => {
     const makeMove = (row, col, letter, player) => {
       setBoard((prevBoard) => {
-        const newBoard = prevBoard.map((r) => r.map((cell) => ({ ...cell }))); // deep copy
+        const newBoard = prevBoard.map((r) => r.map((cell) => ({ ...cell })));
         if (!newBoard[row][col].letter) {
           newBoard[row][col] = {
             letter,
