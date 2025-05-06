@@ -11,7 +11,7 @@ import AuthProtectedRoute from "./../guards/authGuard";
 import Game from "../pages/Game";
 import { Outlet } from "react-router-dom";
 import Home from "../pages/Home";
-import Logout from "../pages/logout";
+import Logout from "../pages/Logout";
 
 function AppRoutes() {
   const loginRoute = (
