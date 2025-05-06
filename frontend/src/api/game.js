@@ -13,7 +13,7 @@ export const getCurrentScoreAsync   = async () => {
 
 export const getRankAsync = async () => {
     try {
-        const response = await axiosInstance.get("/game/get-rank")
+        const response = await axiosInstance.get("/game/get-current-rank");
         if (response) {
             return response.data.rank;
         }
