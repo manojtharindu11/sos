@@ -50,7 +50,7 @@ exports.refreshToken = async (req, res) => {
     const accessToken = await authService.handleRefreshToken(token);
     res.status(200).json({ newAccessToken: accessToken });
   } catch (error) {
-    res.status(403).json({ message: "Token verification failed" });
+    res.status(403).json({ message: "Refresh token verification failed" });
   }
 };
 
