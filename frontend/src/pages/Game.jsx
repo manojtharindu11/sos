@@ -147,7 +147,7 @@ function Game() {
   );
 
   return (
-    <Box minH="100vh" bg="gray.50" py={12}>
+    <Box minH="100vh" maxH="100vh" bg="gray.50" py={12}>
       <Container maxW="container.lg">
         <BreadcrumbNav />
         <Flex direction="column" align="center" justify="center" py={4}>
