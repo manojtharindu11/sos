@@ -3,6 +3,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { UserProvider } from "./context/userContext";
 import MobileBlocker from "./components/mobileBlocker";
 import { useMediaQuery } from "@chakra-ui/react";
+import AppRoutes from "./routes/appRoutes";
 
 function App() {
   const [isMobile] = useMediaQuery("(max-width: 700px)");
