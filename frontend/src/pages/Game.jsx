@@ -19,7 +19,7 @@ import ProfileCard from "../components/ProfileCard";
 import Timer from "../components/Timer";
 import GameOver from "../components/GameOver";
 import BreadcrumbNav from "../components/breadcrumbNav";
-import ActivePlayers from "../components/ActivePlayers";
+import ActivePlayers from "../components/activePlayers";
 import StartGameButton from "../components/StartGameButton";
 
 function Game() {
