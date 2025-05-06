@@ -102,7 +102,7 @@ function Game() {
   );
 
   const StartedGame = () => (
-    <VStack spacing={6} h="calc(100vh - 350px)">
+    <VStack spacing={1} h="calc(100vh - 300px)">
       <Heading
         size="lg"
         bgGradient="linear(to-r, teal.500, blue.500)"

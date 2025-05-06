@@ -14,7 +14,7 @@ function ActivePlayers({ activeUsers }) {
   const onlineCount = activeUsers.length;
 
   return (
-    <Box h="calc(100vh - 350px)" overflowY="auto">
+    <Box h="calc(100vh - 300px)" overflowY="auto">
       <Heading
         size="md"
         mb={4}
