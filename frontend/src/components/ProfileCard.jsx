@@ -50,7 +50,7 @@ function ProfileCard({ winner }) {
   };
 
   const formattedRank =
-    rank !== "Unranked" ? String(rank).padStart(4, "0") : "Unranked";
+    rank !== "Unranked" ? String(rank).padStart(3, "0") : "Unranked";
 
   const bg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
