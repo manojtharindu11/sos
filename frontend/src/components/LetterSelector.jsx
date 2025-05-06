@@ -1,11 +1,34 @@
 import React from "react";
-import { Select } from "@chakra-ui/react";
+import { Button, ButtonGroup, Box, Text } from "@chakra-ui/react";
 
-const LetterSelector = ({ letter, setLetter }) => (
-  <Select value={letter} onChange={(e) => setLetter(e.target.value)} width="100px" mb={4}>
-    <option value="S">S</option>
-    <option value="O">O</option>
-  </Select>
-);
+const LetterSelector = ({ letter, setLetter }) => {
+  const letterButtonsText = [{ letter: "S" }, { letter: "O" }];
+
+  const letterButton = (buttonText) => (
+    <Button
+      key={buttonText.letter}
+      onClick={() => setLetter(buttonText.letter)}
+      colorScheme={letter === buttonText.letter ? "teal" : "gray"}
+      fontSize="xl"
+      fontWeight="italic"
+      aria-pressed={letter === buttonText.letter}
+      _active={{ transform: "scale(0.95)" }}
+      transition="all 0.2s"
+    >
+      {buttonText.letter}
+    </Button>
+  );
+
+  return (
+    <Box mb={6} textAlign="center">
+      <Text fontSize="md" fontWeight="light" mb={3} color="gray.700">
+        Select Your Letter
+      </Text>
+      <ButtonGroup isAttached variant="solid" size="lg">
+        {letterButtonsText.map((buttonText) => letterButton(buttonText))}
+      </ButtonGroup>
+    </Box>
+  );
+};
 
 export default LetterSelector;

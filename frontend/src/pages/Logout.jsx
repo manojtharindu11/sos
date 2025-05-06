@@ -2,12 +2,12 @@ import React, { useRef, useEffect } from "react";
 import { useDisclosure } from "@chakra-ui/react";
 import AuthDrawer from "../components/authDrawer";
 
-function Signup() {
+function Logout() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef();
 
   useEffect(() => {
-    onOpen(); // Open drawer immediately on signup route
+    onOpen(); // Open drawer immediately on logout route
   }, []);
 
   return (
@@ -16,7 +16,7 @@ function Signup() {
         Hidden Trigger
       </button>
       <AuthDrawer
-        type="signup"
+        type="logout"
         isOpen={isOpen}
         onClose={onClose}
         btnRef={btnRef}
@@ -25,4 +25,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default Logout;

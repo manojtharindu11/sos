@@ -1,126 +1,150 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
   Heading,
   Text,
   VStack,
-  HStack,
-  Spacer,
   Container,
-  Flex,
+  List,
+  ListItem,
+  ListIcon,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
 } from "@chakra-ui/react";
-import { isAuthenticated, logout } from "../api/auth";
-import { transform } from "framer-motion";
+import { FaCheckCircle } from "react-icons/fa";
+import { useNavigate, useLocation } from "react-router-dom";
+import HomeHeader from "../components/homeHeader";
+import { isAuthenticated } from "../api/auth";
 
 function Home() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [defaultIndex, setDefaultIndex] = useState(0);
 
-  // State for managing hover effect
-  const [isHovered, setIsHovered] = useState(false);
+  useEffect(() => {
+    if (isAuthenticated()) {
+      setDefaultIndex(2);
+    } else {
+      setDefaultIndex(0);
+    }
+  }, [location.pathname]);
 
-  // Handle log out
-  const handleLogOut = () => {
-    logout();
-    navigate("/login");
-  };
+  const getStartedButton = (
+    <Button
+      mt={6}
+      ml={0}
+      size="lg"
+      colorScheme="blue"
+      bg="blue.500"
+      color="white"
+      _hover={{
+        bg: "blue.600",
+        transform: "scale(1.05)",
+        boxShadow: "lg",
+      }}
+      transition="all 0.2s ease-in-out"
+      onClick={() => {
+        isAuthenticated() ? navigate("/game") : navigate("/home/login");
+      }}
+    >
+      Get Started
+    </Button>
+  );
 
-  // Inline style for the button
-  const logoutButtonStyle = {
-    backgroundColor: isHovered ? "white" : "#f56565", // Change on hover
-    color: isHovered ? "#f56565" : "white", // Change on hover
-    border: "1px solid",
-    borderColor: isHovered ? "#f56565" : "transparent", // Change on hover
-    transition: "all 0.2s ease-in-out", // Smooth transition
-    transform: isHovered ? "scale(1.03)": "scale(1)"
-  };
+  const howToPlayList = (
+    <Text fontSize="md" color="gray.600" lineHeight="1.8">
+      1. The game board is a 3x3 grid.
+      <br />
+      2. Each player takes turns selecting a cell and choosing either "S" or
+      "O".
+      <br />
+      3. A point is scored when a player forms "SOS" in any direction.
+      <br />
+      4. The game continues until all cells are filled.
+      <br />
+      5. The player with the most points wins!
+    </Text>
+  );
+
+  const whyYouWillLoveItList = (
+    <List spacing={4} color="gray.600">
+      {[
+        "Fast-paced and strategic gameplay",
+        "Great for players of all ages",
+        "Challenge your friends online",
+        "Track your performance and improve over time",
+      ].map((item, idx) => (
+        <ListItem key={idx}>
+          <ListIcon as={FaCheckCircle} color="blue.500" />
+          {item}
+        </ListItem>
+      ))}
+    </List>
+  );
+
+  const tabView = [
+    {
+      tab: "How to Play",
+      tabPanel: howToPlayList,
+    },
+    {
+      tab: "Why You'll Love It",
+      tabPanel: whyYouWillLoveItList,
+    },
+    {
+      tab: "Let's Get Started",
+      tabPanel: getStartedButton,
+    },
+  ];
 
   return (
     <Box minH="100vh" bg="gray.50" py={12}>
       <Container maxW="container.lg">
-        {/* Header */}
-        <Flex align="center" mb={10}>
-          <Heading size="lg" color="blue.600">
-            SOS Game
-          </Heading>
-          <Spacer />
-          <HStack spacing={4}>
-            {!isAuthenticated() && (
-              <HStack spacing={4}>
-                <Button
-                  colorScheme="blue"
-                  variant="outline"
-                  _hover={{
-                    bg: "blue.500",
-                    color: "white",
-                    borderColor: "blue.500",
-                    transform: "scale(1.03)",
-                  }}
-                  transition="all 0.2s ease-in-out"
-                  onClick={() => navigate("/login")}
-                >
-                  Log In
-                </Button>
-                <Button
-                  colorScheme="blue"
-                  bg="blue.500"
-                  color="white"
-                  _hover={{
-                    bg: "blue.600",
-                    transform: "scale(1.03)",
-                  }}
-                  transition="all 0.2s ease-in-out"
-                  onClick={() => navigate("/signup")}
-                >
-                  Sign Up
-                </Button>
-              </HStack>
-            )}
-            {isAuthenticated() && (
-              <Button
-                style={logoutButtonStyle} // Apply inline styles
-                onMouseEnter={() => setIsHovered(true)} // Hover in
-                onMouseLeave={() => setIsHovered(false)} // Hover out
-                onClick={handleLogOut}
-              >
-                Log out
-              </Button>
-            )}
-          </HStack>
-        </Flex>
+        <HomeHeader />
 
-        {/* Body Content */}
-        <VStack spacing={6} align="start">
+        <VStack spacing={10} align="start">
           <Heading size="2xl" color="gray.700">
             Welcome to the SOS Game!
           </Heading>
           <Text fontSize="lg" color="gray.600">
-            SOS is a fun and simple word game played on a 3x3 grid. Players take
-            turns placing an "S" or an "O" in any empty cell. The goal is to
-            form the sequence "SOS" in any direction—horizontally, vertically,
-            or diagonally.
-          </Text>
-          <Text fontSize="md" color="gray.500">
-            Challenge your friends, track your score, and climb the leaderboard!
+            SOS is a classic two-player game where players take turns placing an
+            "S" or an "O" on a 3x3 grid. The goal is to form the word "SOS"
+            horizontally, vertically, or diagonally.
           </Text>
 
-          <Button
-            mt={4}
-            size="lg"
-            colorScheme="blue"
-            bg="blue.500"
-            color="white"
-            marginLeft={0}
-            _hover={{
-              bg: "blue.600",
-              transform: "scale(1.03)",
-            }}
-            transition="all 0.2s ease-in-out"
-            onClick={() => navigate("/game")}
+          <Tabs
+            variant="enclosed"
+            index={defaultIndex}
+            onChange={(index) => setDefaultIndex(index)}
           >
-            Get Started
-          </Button>
+            <TabList>
+              {tabView.map((tabItem, idx) => (
+                <Tab
+                  key={idx}
+                  fontSize="sm"
+                  fontWeight="semibold"
+                  color="gray.700"
+                  _selected={{
+                    color: "gray.700",
+                    borderBottom: "2px solid #3182ce",
+                  }}
+                  _hover={{ color: "white" }}
+                >
+                  {tabItem.tab}
+                </Tab>
+              ))}
+            </TabList>
+
+            <TabPanels>
+              {tabView.map((tabItem, idx) => (
+                <TabPanel key={idx}>{tabItem.tabPanel}</TabPanel>
+              ))}
+            </TabPanels>
+          </Tabs>
         </VStack>
       </Container>
     </Box>

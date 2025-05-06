@@ -12,7 +12,7 @@ export const UserProvider = ({ children }) => {
       // Only set user if the token is decoded properly
       setUser(decoded);
     }
-  }, []); // Empty dependency array ensures it runs once on mount
+  }, []);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
