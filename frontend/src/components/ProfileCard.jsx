@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Box,
   Flex,
@@ -11,16 +11,43 @@ import {
 import { UserContext } from "../context/userContext";
 import { NavLink } from "react-router-dom"; // Import NavLink for navigation
 import { decodedToken } from "../utils/token";
+import { getCurrentScoreAsync } from "../api/game";
 
 function ProfileCard() {
   const { user, setUser } = useContext(UserContext);
+  const [currentScore, setCurrentScore] = useState(0);
+  const [rank, setRank] = useState("Unranked"); 
 
   useEffect(() => {
     const decoded = decodedToken();
     if (decoded) {
       setUser(decoded);
     }
+    getCurrentScore();
+    getRank();
   }, []);
+
+  const getCurrentScore = async () => {
+    try {
+      const score = await getCurrentScoreAsync();
+      if (score) {
+        setCurrentScore(score);
+      }
+    } catch (error) {
+      console.error("Error fetching current score:", error);
+    }
+  };
+
+  const getRank = async () => {
+    try {
+      const rank = await getRankAsync();
+      if (rank) {
+        setRank(rank);
+      }
+    } catch (error) {
+      console.error("Error fetching rank:", error);
+    }
+  }
 
   const bg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
@@ -89,7 +116,7 @@ function ProfileCard() {
             <Text fontSize="sm" color={textColor}>
               Rank:{" "}
               <Badge colorScheme="blue" ml={1}>
-                {user?.rank || "Unranked"}
+                {rank}
               </Badge>
             </Text>
           </Box>
@@ -102,7 +129,7 @@ function ProfileCard() {
             </Text>
             <Text fontWeight="semibold" textAlign="center" fontSize="lg">
               <Badge colorScheme="green" fontSize="1em">
-                {user?.score || 0}
+                {currentScore}
               </Badge>
             </Text>
           </Box>
