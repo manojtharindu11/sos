@@ -122,7 +122,7 @@ npm install
 MONGODB_URI=mongodb://localhost:27017/sosGame
 PORT=5000
 
-FRONTEND_URL=http://localhost:5173
+VITE_FRONTEND_URLS="http://localhost:5173,http://localhost:3000"
 
 ACCESS_TOKEN_SECRET=yourAccessTokenSecret
 ACCESS_TOKEN_EXPIRY=15m
