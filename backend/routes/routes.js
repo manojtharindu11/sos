@@ -16,5 +16,10 @@ router.get(
   authMiddleware,
   gameController.getCurrentScore
 );
+router.get(
+  "/game/get-current-rank",
+  authMiddleware,
+  gameController.getCurrentRank
+);
 
 module.exports = router;
