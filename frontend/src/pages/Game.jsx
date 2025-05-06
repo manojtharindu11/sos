@@ -19,8 +19,8 @@ import ProfileCard from "../components/ProfileCard";
 import Timer from "../components/Timer";
 import GameOver from "../components/GameOver";
 import BreadcrumbNav from "../components/breadcrumbNav";
-import StartGameButton from "../components/StartGameButton";
-import ActivePlayers from "../components/ActivePlayers";
+import StartGameButton from "../components/startGameButton";
+import ActivePlayers from "../components/activePlayers";
 
 function Game() {
   const navigate = useNavigate();
