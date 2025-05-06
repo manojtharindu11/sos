@@ -12,8 +12,7 @@ function App() {
 
   return (
     <ChakraProvider>
-      {/* <UserProvider>{displayContent}</UserProvider> */}
-      <AppRoutes />
+      <UserProvider>{displayContent}</UserProvider>
     </ChakraProvider>
   );
 }

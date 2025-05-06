@@ -24,7 +24,7 @@ import ActivePlayers from "../components/activePlayers";
 
 function Game() {
   const navigate = useNavigate();
-  const { user } = useContext(UserContext);
+  const { user } = useContext(UserContext) || {};
   const [letter, setLetter] = useState("S");
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
