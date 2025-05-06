@@ -18,7 +18,7 @@ import { UserContext } from "../context/userContext";
 import ProfileCard from "../components/ProfileCard";
 import Timer from "../components/Timer";
 import GameOver from "../components/GameOver";
-import BreadcrumbNav from "../components/BreadcrumbNav";
+import BreadcrumbNav from "../components/breadcrumbNav";
 import ActivePlayers from "../components/ActivePlayers";
 import StartGameButton from "../components/StartGameButton";
 
