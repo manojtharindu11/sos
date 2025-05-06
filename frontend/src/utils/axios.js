@@ -2,47 +2,72 @@ import axios from "axios";
 
 const axiosInstance = axios.create({
   baseURL: `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/v1`,
-  timeout: 10000, // 10 seconds timeout
+  timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
+// Request interceptor to attach the access token
+axiosInstance.interceptors.request.use((config) => {
+  const token = sessionStorage.getItem("accessToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Helper to refresh token
+const refreshToken = async () => {
+  try {
+    const token = sessionStorage.getItem("refreshToken");
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_URL || "http://localhost:5000"}/api/v1/auth/refresh`,
+      { token: token }
+    );
+    const newAccessToken = response.data.newAccessToken;
+    sessionStorage.setItem("accessToken", newAccessToken);
+    return newAccessToken;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Response interceptor
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response) {
-      const status = error.response.status;
-      const message = error.response.data?.message || "An error occurred";
+  async (error) => {
+    const originalRequest = error.config;
+    const status = error.response?.status;
 
-      console.error(`Error ${status}: ${message}`);
-      if (status === 401) {
-        // Handle unauthorized access (e.g., redirect to login)
-        // window.location.href = '/login';
-      } else if (status === 403) {
-        // Handle forbidden access
-        alert("You do not have permission to access this resource.");
-      } else if (status >= 500) {
-        // Handle server errors
-        alert("Server error. Please try again later.");
-      } else if (status === 422) {
-        const errors = error.response.data.errors;
-        for (const error of errors) {
-          console.log(error.msg);
-        }
+    if (status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const newToken = await refreshToken();
+        axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+        originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
+        return axiosInstance(originalRequest); // Retry original request
+      } catch (err) {
+        // Refresh token failed – logout user
+        sessionStorage.clear(); // or remove only accessToken and refreshToken
+        window.location.href = "/home/login"; // Redirect to login
+        return Promise.reject({ message: "Session expired. Please log in again." });
       }
-
-      return Promise.reject({ status, message, originalError: error });
-    } else if (error.request) {
-      console.error("No response received:", error.request);
-      return Promise.reject({
-        message: "No response from server. Please check your network",
-        originalError: error,
-      });
-    } else {
-      console.error("Axios error:", error.message);
-      return Promise.reject({ message: error.message, originalError: error });
     }
+
+    // Other error handling
+    if (status === 403) {
+      alert("You do not have permission to access this resource.");
+    } else if (status >= 500) {
+      alert("Server error. Please try again later.");
+    } else if (status === 422) {
+      const errors = error.response.data.errors;
+      for (const err of errors) {
+        console.log(err.msg);
+      }
+    }
+
+    return Promise.reject(error);
   }
 );
 
