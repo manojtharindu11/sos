@@ -9,10 +9,21 @@ const app = express();
 const server = http.createServer(app);
 const routes = require("./routes/routes");
 
+const allowedOrigins = process.env.FRONTEND_URLS.split(","); 
 // Socket.IO setup
 const io = new Server(server, {
-  cors: { origin: process.env.FRONTEND_URL, methods: ["GET", "POST"] },
+  cors: {
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST"]
+  }
 });
+
 
 // MongoDB Connection
 mongoose
