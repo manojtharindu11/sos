@@ -20,8 +20,8 @@ const io = new Server(server, {
       "http://localhost:5173",
       "http://localhost:3000",
       "https://sos-game-theta.vercel.app",
+      "https://sos-game-manoj-thilakarathnas-projects.vercel.app/",
       "https://sos-game-git-main-manoj-thilakarathnas-projects.vercel.app",
-      "https://sos-game-qavgb6x0m-manoj-thilakarathnas-projects.vercel.app"
     ],
     methods: ["GET", "POST"]
   }
