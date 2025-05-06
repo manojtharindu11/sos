@@ -11,12 +11,12 @@ import {
 import { UserContext } from "../context/userContext";
 import { NavLink } from "react-router-dom"; // Import NavLink for navigation
 import { decodedToken } from "../utils/token";
-import { getCurrentScoreAsync } from "../api/game";
+import { getCurrentScoreAsync, getRankAsync } from "../api/game";
 
-function ProfileCard() {
+function ProfileCard({ winner }) {
   const { user, setUser } = useContext(UserContext);
   const [currentScore, setCurrentScore] = useState(0);
-  const [rank, setRank] = useState("Unranked"); 
+  const [rank, setRank] = useState("Unranked");
 
   useEffect(() => {
     const decoded = decodedToken();
@@ -25,7 +25,7 @@ function ProfileCard() {
     }
     getCurrentScore();
     getRank();
-  }, []);
+  }, [winner]);
 
   const getCurrentScore = async () => {
     try {
@@ -47,7 +47,10 @@ function ProfileCard() {
     } catch (error) {
       console.error("Error fetching rank:", error);
     }
-  }
+  };
+
+  const formattedRank =
+    rank !== "Unranked" ? String(rank).padStart(4, "0") : "Unranked";
 
   const bg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
@@ -116,7 +119,7 @@ function ProfileCard() {
             <Text fontSize="sm" color={textColor}>
               Rank:{" "}
               <Badge colorScheme="blue" ml={1}>
-                {rank}
+                {formattedRank}
               </Badge>
             </Text>
           </Box>

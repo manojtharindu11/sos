@@ -6,6 +6,7 @@ const LetterSelector = ({ letter, setLetter }) => {
 
   const letterButton = (buttonText) => (
     <Button
+      key={buttonText.letter}
       onClick={() => setLetter(buttonText.letter)}
       colorScheme={letter === buttonText.letter ? "teal" : "gray"}
       fontSize="xl"
